@@ -3,11 +3,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
-'use client'
-
-import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
-
 function riskClass(risk: string) {
   if (risk === 'Bajo') return 'bg-green-100 text-green-700'
   if (risk === 'Medio') return 'bg-yellow-100 text-yellow-700'
