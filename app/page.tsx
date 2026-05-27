@@ -1,3 +1,11 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { supabase } from '../lib/supabase'
+
+'use client'
+
+import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
 function riskClass(risk: string) {
@@ -7,27 +15,64 @@ function riskClass(risk: string) {
   return 'bg-gray-100 text-gray-700'
 }
 
-export default async function Home() {
-  const { data, error } = await supabase
-    .from('imports')
-    .select('*')
+export default function Home() {
+  const [data, setData] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const total = data?.length || 0
+  useEffect(() => {
+    async function loadData() {
+      const { data: userData } = await supabase.auth.getUser()
+
+      if (!userData.user) {
+        window.location.href = '/login'
+        return
+      }
+
+      const { data, error } = await supabase
+        .from('imports')
+        .select('*')
+
+      if (error) {
+        alert(error.message)
+        return
+      }
+
+      setData(data || [])
+      setLoading(false)
+    }
+
+    loadData()
+  }, [])
+
+  async function logout() {
+    await supabase.auth.signOut()
+    window.location.href = '/login'
+  }
+
+  const total = data.length
 
   const active =
-    data?.filter(
+    data.filter(
       (item) => item.status !== 'Cerrado'
-    ).length || 0
+    ).length
 
   const highRisk =
-    data?.filter(
+    data.filter(
       (item) => item.risk === 'Alto'
-    ).length || 0
+    ).length
 
   const nextDeliveries =
-    data?.filter(
+    data.filter(
       (item) => item.possible_delivery_date
-    ).length || 0
+    ).length
+
+  if (loading) {
+    return (
+      <main className="p-10">
+        Cargando...
+      </main>
+    )
+  }
 
   return (
     <main className="min-h-screen bg-gray-100 p-10">
@@ -36,19 +81,22 @@ export default async function Home() {
           Import Tracker
         </h1>
 
-        <a
-          href="/new-import"
-          className="bg-black text-white px-5 py-3 rounded-xl"
-        >
-          Nueva importación
-        </a>
-      </div>
+        <div className="flex gap-3">
+          <a
+            href="/new-import"
+            className="bg-black text-white px-5 py-3 rounded-xl"
+          >
+            Nueva importación
+          </a>
 
-      {error && (
-        <p className="text-red-500">
-          Error: {error.message}
-        </p>
-      )}
+          <button
+            onClick={logout}
+            className="border px-5 py-3 rounded-xl"
+          >
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-white rounded-2xl shadow p-5">
@@ -97,7 +145,7 @@ export default async function Home() {
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {data?.map((item) => (
+        {data.map((item) => (
           <div
             key={item.id}
             className="bg-white rounded-2xl shadow p-6"
