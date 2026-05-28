@@ -17,6 +17,7 @@ export default function EditImportPage({
   const [possibleDeliveryDate, setPossibleDeliveryDate] = useState('')
   const [risk, setRisk] = useState('')
   const [notes, setNotes] = useState('')
+  const [payments, setPayments] = useState<any[]>([])
 
   useEffect(() => {
     async function loadImport() {
@@ -38,6 +39,14 @@ export default function EditImportPage({
       setPossibleDeliveryDate(data.possible_delivery_date || '')
       setRisk(data.risk || '')
       setNotes(data.notes || '')
+
+      const { data: paymentsData } = await supabase
+        .from('payments')
+        .select('*')
+        .eq('import_id', id)
+        .order('created_at', { ascending: false })
+
+      setPayments(paymentsData || [])
     }
 
     loadImport()
@@ -142,6 +151,41 @@ export default function EditImportPage({
           Guardar cambios
         </button>
       </form>
+
+      <div className="mt-10">
+        <h2 className="text-2xl font-bold mb-4">
+          Pagos relacionados
+        </h2>
+
+        <div className="space-y-4">
+          {payments.map((payment) => (
+            <div
+              key={payment.id}
+              className="bg-white rounded-2xl shadow p-5"
+            >
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-xl font-semibold">
+                    {payment.concept}
+                  </h3>
+
+                  <p>
+                    {payment.currency} {payment.amount}
+                  </p>
+
+                  <p className="text-gray-500">
+                    Vencimiento: {payment.due_date}
+                  </p>
+                </div>
+
+                <span className="bg-blue-100 text-blue-700 px-4 py-2 rounded-full">
+                  {payment.status}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </main>
   )
 }
