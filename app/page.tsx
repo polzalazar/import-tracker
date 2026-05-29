@@ -76,26 +76,35 @@ export default function Home() {
           Import Tracker
         </h1>
 
-        <div className="flex gap-3">
-          <a
-            href="/new-import"
-            className="bg-black text-white px-5 py-3 rounded-xl"
-          >
-            Nueva importación
-          </a>
-<a
-  href="/documents"
-  className="border px-5 py-3 rounded-xl"
->
-  Documentos
-</a>
-          <button
-            onClick={logout}
-            className="border px-5 py-3 rounded-xl"
-          >
-            Cerrar sesión
-          </button>
-        </div>
+<div className="flex gap-3">
+  <a
+    href="/new-import"
+    className="bg-black text-white px-5 py-3 rounded-xl"
+  >
+    Nueva importación
+  </a>
+
+  <a
+    href="/documents"
+    className="border px-5 py-3 rounded-xl"
+  >
+    Documentos
+  </a>
+
+  <a
+    href="/payments"
+    className="border px-5 py-3 rounded-xl"
+  >
+    Pagos
+  </a>
+
+  <button
+    onClick={logout}
+    className="border px-5 py-3 rounded-xl"
+  >
+    Cerrar sesión
+  </button>
+</div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
