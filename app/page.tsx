@@ -83,7 +83,12 @@ export default function Home() {
           >
             Nueva importación
           </a>
-
+<a
+  href="/documents"
+  className="border px-5 py-3 rounded-xl"
+>
+  Documentos
+</a>
           <button
             onClick={logout}
             className="border px-5 py-3 rounded-xl"
