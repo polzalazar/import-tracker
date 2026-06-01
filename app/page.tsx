@@ -9,10 +9,29 @@ function riskClass(risk: string) {
   if (risk === 'Alto') return 'bg-red-100 text-red-700'
   return 'bg-gray-100 text-gray-700'
 }
+function money(value: any, currency: 'USD' | 'ARS') {
+  const number = Number(value || 0)
+
+  if (currency === 'USD') {
+    return `U$S ${number.toLocaleString('es-AR')}`
+  }
+
+  return `$ ${number.toLocaleString('es-AR')}`
+}
+
+function formatDate(date: string) {
+  if (!date) return 'Sin fecha'
+
+  return new Date(date + 'T00:00:00').toLocaleDateString('es-AR')
+}
 
 export default function Home() {
   const [data, setData] = useState<any[]>([])
+  const [payments, setPayments] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+const [statusFilter, setStatusFilter] = useState('Estado')
+const [riskFilter, setRiskFilter] = useState('Riesgo')
 
   useEffect(() => {
     async function loadData() {
@@ -25,7 +44,13 @@ export default function Home() {
 
       const { data, error } = await supabase
         .from('imports')
-        .select('*')
+.select(`
+  *,
+  payments (*)
+`)
+        const { data: paymentsData } = await supabase
+  .from('payments')
+  .select('*')
 
       if (error) {
         alert(error.message)
@@ -33,6 +58,7 @@ export default function Home() {
       }
 
       setData(data || [])
+      setPayments(paymentsData || [])
       setLoading(false)
     }
 
@@ -60,6 +86,38 @@ export default function Home() {
     data.filter(
       (item) => item.possible_delivery_date
     ).length
+    const usdPayments = payments.filter(
+  (payment) => payment.currency === 'USD'
+)
+
+const usdCommitted = usdPayments.reduce(
+  (total, payment) => total + Number(payment.amount || 0),
+  0
+)
+
+const usdPaid = usdPayments
+  .filter((payment) => payment.status === 'Pagado')
+  .reduce(
+    (total, payment) => total + Number(payment.amount || 0),
+    0
+  )
+
+const usdPending = usdCommitted - usdPaid
+    const filteredData = data.filter((item) => {
+  const matchesSearch =
+    item.code?.toLowerCase().includes(search.toLowerCase()) ||
+    item.main_product?.toLowerCase().includes(search.toLowerCase())
+
+  const matchesStatus =
+  statusFilter === 'Estado' ||
+  item.status?.toLowerCase() === statusFilter.toLowerCase()
+
+  const matchesRisk =
+  riskFilter === 'Riesgo' ||
+  item.risk?.toLowerCase() === riskFilter.toLowerCase()
+
+  return matchesSearch && matchesStatus && matchesRisk
+})
 
   if (loading) {
     return (
@@ -107,7 +165,7 @@ export default function Home() {
 </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-7 gap-4 mb-8">
         <div className="bg-white rounded-2xl shadow p-5">
           <p className="text-gray-500 text-sm">
             Total importaciones
@@ -147,14 +205,96 @@ export default function Home() {
             {nextDeliveries}
           </p>
         </div>
+        <div className="bg-white rounded-2xl shadow p-5">
+  <p className="text-gray-500 text-sm">
+    USD comprometidos
+  </p>
+
+  <p className="text-3xl font-bold">
+    {usdCommitted.toLocaleString()}
+  </p>
+</div>
+
+<div className="bg-white rounded-2xl shadow p-5">
+  <p className="text-gray-500 text-sm">
+    USD pagados
+  </p>
+
+  <p className="text-3xl font-bold text-green-600">
+    {usdPaid.toLocaleString()}
+  </p>
+</div>
+
+<div className="bg-white rounded-2xl shadow p-5">
+  <p className="text-gray-500 text-sm">
+    USD pendientes
+  </p>
+
+  <p className="text-3xl font-bold text-red-600">
+    {usdPending.toLocaleString()}
+  </p>
+</div>
       </div>
 
       <h2 className="text-2xl font-bold mb-4">
         Importaciones
       </h2>
+      <div className="bg-white rounded-2xl shadow p-4 mb-6 flex flex-col md:flex-row gap-4">
+  <input
+    className="border p-3 rounded flex-1"
+    placeholder="Buscar por código o producto..."
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+  />
+
+  <select
+    className="border p-3 rounded"
+    value={statusFilter}
+    onChange={(e) => setStatusFilter(e.target.value)}
+  >
+    <option>Estado</option>
+    <option>Pedido confirmado</option>
+    <option>En fabricación</option>
+    <option>Listo para embarcar</option>
+    <option>Embarcado</option>
+    <option>En tránsito</option>
+    <option>Arribado</option>
+    <option>En aduana</option>
+    <option>Nacionalizado</option>
+    <option>En depósito</option>
+    <option>Disponible</option>
+    <option>Cerrado</option>
+  </select>
+
+  <select
+    className="border p-3 rounded"
+    value={riskFilter}
+    onChange={(e) => setRiskFilter(e.target.value)}
+  >
+    <option>Riesgo</option>
+    <option>Bajo</option>
+    <option>Medio</option>
+    <option>Alto</option>
+  </select>
+</div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {data.map((item) => (
+        {filteredData.map((item) => {
+  const itemPayments = item.payments || []
+
+  const paidTotal = itemPayments
+    .filter((payment: any) => payment.status?.toLowerCase() === 'pagado')
+    .reduce((total: number, payment: any) => total + Number(payment.amount || 0), 0)
+
+  const pendingTotal = itemPayments
+    .filter((payment: any) => payment.status?.toLowerCase() !== 'pagado')
+    .reduce((total: number, payment: any) => total + Number(payment.amount || 0), 0)
+
+  const nextDue = itemPayments
+    .filter((payment: any) => payment.status?.toLowerCase() !== 'pagado' && payment.due_date)
+    .sort((a: any, b: any) => a.due_date.localeCompare(b.due_date))[0]?.due_date
+
+  return (
           <div
             key={item.id}
             className="bg-white rounded-2xl shadow p-6"
@@ -174,12 +314,50 @@ export default function Home() {
             </p>
 
             <p className="mb-2">
-              <b>ETA Puerto:</b> {item.eta_port}
+              <b>ETA Puerto:</b> {formatDate(item.eta_port)}
             </p>
 
             <p className="mb-2">
-              <b>Delivery posible:</b> {item.possible_delivery_date}
+              <b>Delivery posible:</b> {formatDate(item.possible_delivery_date)}
             </p>
+            <p className="mb-2">
+  <b>ARCA estimado:</b> {money(item.arca_estimated, 'ARS')}
+</p>
+
+<p className="mb-2">
+  <b>Fecha tentativa ARCA:</b> {formatDate(item.arca_payment_date)}
+</p>
+<div className="mt-4 border-t pt-4">
+  <p className="font-bold mb-2">💰 Fabricación</p>
+
+  <p className="text-sm">
+    <b>Costo total:</b> {money(item.manufacturer_cost, 'USD')}
+  </p>
+
+  <p className="text-sm">
+    <b>Pagado:</b> {money(paidTotal, 'USD')}
+  </p>
+
+  <p className="text-sm">
+    <b>Pendiente:</b> {money(Number(item.manufacturer_cost || 0) - paidTotal, 'USD')}
+  </p>
+</div>
+
+<div className="mt-4 border-t pt-4">
+  <p className="font-bold mb-2">ARCA</p>
+
+  <p className="text-sm">
+    <b>Estimado:</b> {money(item.arca_estimated, 'ARS')}
+  </p>
+
+  <p className="text-sm">
+    <b>Pago previsto:</b> {formatDate(item.arca_payment_date)}
+  </p>
+
+  <p className="text-sm">
+    <b>Estado:</b> {item.arca_status || 'Pendiente'}
+  </p>
+</div>
 
             <p className="mb-2">
               <b>Riesgo:</b>{' '}
@@ -189,20 +367,76 @@ export default function Home() {
                 {item.risk}
               </span>
             </p>
+            <div className="mt-4 border-t pt-4">
+  <p className="font-bold mb-2">Pagos</p>
 
-            <div className="mt-4 border-t pt-4 text-gray-600 text-sm">
-              {item.notes}
-            </div>
+<div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4 text-sm">
+  <div className="bg-green-50 p-3 rounded-xl">
+    <p className="text-gray-500">Pagado</p>
+    <p className="font-bold text-green-700">
+      {money(paidTotal, 'USD')}
+    </p>
+  </div>
 
-            <a
-              href={`/imports/${item.id}`}
-              className="inline-block mt-4 bg-black text-white px-4 py-2 rounded-xl"
-            >
-              Editar
-            </a>
-          </div>
-        ))}
+  <div className="bg-red-50 p-3 rounded-xl">
+    <p className="text-gray-500">Pendiente</p>
+    <p className="font-bold text-red-700">
+      USD {pendingTotal.toLocaleString()}
+    </p>
+  </div>
+
+  <div className="bg-gray-50 p-3 rounded-xl">
+    <p className="text-gray-500">Próximo venc.</p>
+    <p className="font-bold">
+      {nextDue || 'Sin venc.'}
+    </p>
+  </div>
+</div>
+
+{item.payments?.length > 0 ? (
+  <div className="space-y-2">
+    {item.payments.map((payment: any) => (
+      <div
+        key={payment.id}
+        className="flex justify-between text-sm"
+      >
+        <span>
+          {payment.concept} - {payment.due_date}
+        </span>
+
+        <span
+          className={
+            payment.status === 'Pagado'
+              ? 'text-green-600 font-semibold'
+              : 'text-red-600 font-semibold'
+          }
+        >
+          {payment.status} {payment.currency} {payment.amount}
+        </span>
       </div>
-    </main>
+    ))}
+  </div>
+) : (
+  <p className="text-gray-500 text-sm">
+    Sin pagos cargados
+  </p>
+)}
+</div>
+
+<div className="mt-4 border-t pt-4 text-gray-600 text-sm">
+  {item.notes}
+</div>
+
+<a
+  href={`/imports/${item.id}`}
+  className="inline-block mt-4 bg-black text-white px-4 py-2 rounded-xl"
+>
+  Editar
+</a>
+</div>
   )
+})}
+</div>
+</main>
+)
 }

@@ -17,6 +17,10 @@ export default function EditImportPage({
   const [possibleDeliveryDate, setPossibleDeliveryDate] = useState('')
   const [risk, setRisk] = useState('')
   const [notes, setNotes] = useState('')
+  const [manufacturerCost, setManufacturerCost] = useState('')
+const [arcaEstimated, setArcaEstimated] = useState('')
+const [arcaStatus, setArcaStatus] = useState('Pendiente')
+const [arcaPaymentDate, setArcaPaymentDate] = useState('')
   const [payments, setPayments] = useState<any[]>([])
 
   useEffect(() => {
@@ -39,6 +43,10 @@ export default function EditImportPage({
       setPossibleDeliveryDate(data.possible_delivery_date || '')
       setRisk(data.risk || '')
       setNotes(data.notes || '')
+      setManufacturerCost(data.manufacturer_cost || '')
+setArcaEstimated(data.arca_estimated || '')
+setArcaStatus(data.arca_status || 'Pendiente')
+setArcaPaymentDate(data.arca_payment_date || '')
 
       const { data: paymentsData } = await supabase
         .from('payments')
@@ -63,8 +71,12 @@ export default function EditImportPage({
         status,
         eta_port: etaPort || null,
         possible_delivery_date: possibleDeliveryDate || null,
-        risk,
-        notes,
+       risk,
+notes,
+manufacturer_cost: manufacturerCost || null,
+arca_estimated: arcaEstimated || null,
+arca_status: arcaStatus,
+arca_payment_date: arcaPaymentDate || null,
       })
       .eq('id', id)
 
@@ -117,21 +129,32 @@ export default function EditImportPage({
           <option>Cerrado</option>
         </select>
 
-        <input
-          type="date"
-          className="w-full border p-3 rounded"
-          value={etaPort}
-          onChange={(e) => setEtaPort(e.target.value)}
-        />
+       <label className="font-semibold">
+  ETA Puerto
+</label>
 
-        <input
-          type="date"
-          className="w-full border p-3 rounded"
-          value={possibleDeliveryDate}
-          onChange={(e) => setPossibleDeliveryDate(e.target.value)}
-        />
+<input
+  type="date"
+  className="w-full border p-3 rounded"
+  value={etaPort}
+  onChange={(e) => setEtaPort(e.target.value)}
+/>
 
-        <select
+<label className="font-semibold">
+  Delivery posible
+</label>
+
+<input
+  type="date"
+  className="w-full border p-3 rounded"
+  value={possibleDeliveryDate}
+  onChange={(e) => setPossibleDeliveryDate(e.target.value)}
+/>
+
+        <label className="font-semibold">
+  Riesgo
+</label>
+<select
           className="w-full border p-3 rounded"
           value={risk}
           onChange={(e) => setRisk(e.target.value)}
@@ -141,15 +164,85 @@ export default function EditImportPage({
           <option>Alto</option>
         </select>
 
-        <textarea
+ <h3 className="text-xl font-bold mt-4">
+  💰 Fabricación
+</h3>
+
+<label className="font-semibold">
+  Costo total fabricación
+</label>
+
+<input
+  type="text"
+  className="w-full border p-3 rounded"
+  value={Number(manufacturerCost || 0).toLocaleString('es-AR')}
+  onChange={(e) =>
+    setManufacturerCost(
+      e.target.value.replace(/\./g, '')
+    )
+  }
+/>
+
+<h3 className="text-xl font-bold mt-4">
+  ARCA
+</h3>
+
+<label className="font-semibold">
+  ARCA estimado
+</label>
+
+<input
+  type="text"
+  className="w-full border p-3 rounded"
+  value={Number(arcaEstimated || 0).toLocaleString('es-AR')}
+  onChange={(e) =>
+    setArcaEstimated(
+      e.target.value.replace(/\./g, '')
+    )
+  }
+/>
+
+<label className="font-semibold">
+  Estado ARCA
+</label>
+<select
+  className="w-full border p-3 rounded"
+  value={arcaStatus}
+  onChange={(e) => setArcaStatus(e.target.value)}
+>
+  <option>Pendiente</option>
+  <option>Pagado</option>
+</select>
+<label className="font-semibold">
+  Fecha tentativa pago ARCA
+</label>
+<input
+  type="date"
+  className="w-full border p-3 rounded"
+  value={arcaPaymentDate}
+  onChange={(e) => setArcaPaymentDate(e.target.value)}
+/>
+<label className="font-semibold">
+  Notas
+</label>
+<textarea
           className="w-full border p-3 rounded"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
         />
 
-        <button className="bg-black text-white px-6 py-3 rounded-xl">
-          Guardar cambios
-        </button>
+        <div className="flex gap-3">
+  <button className="bg-black text-white px-6 py-3 rounded-xl">
+    Guardar cambios
+  </button>
+
+  <a
+    href="/"
+    className="border px-6 py-3 rounded-xl"
+  >
+    Cancelar
+  </a>
+</div>
       </form>
 
       <div className="mt-10">
