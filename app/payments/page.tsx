@@ -177,6 +177,12 @@ export default function PaymentsPage() {
               <span className="bg-blue-100 text-blue-700 px-4 py-2 rounded-full">
                 {payment.status}
               </span>
+              <a
+  href={`/payments/${payment.id}`}
+  className="bg-black text-white px-4 py-2 rounded-xl"
+>
+  Editar
+</a>
             </div>
           </div>
         ))}

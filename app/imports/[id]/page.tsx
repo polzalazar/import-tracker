@@ -164,7 +164,8 @@ arca_payment_date: arcaPaymentDate || null,
           <option>Alto</option>
         </select>
 
- <h3 className="text-xl font-bold mt-4">
+<div className="border-2 border-gray-400 rounded-2xl p-4 bg-gray-100">
+   <h3 className="text-xl font-bold mt-4">
   💰 Fabricación
 </h3>
 
@@ -182,10 +183,11 @@ arca_payment_date: arcaPaymentDate || null,
     )
   }
 />
-
-<h3 className="text-xl font-bold mt-4">
-  ARCA
-</h3>
+</div>
+<div className="border-2 border-gray-400 rounded-2xl p-4 bg-gray-100">
+  <h3 className="text-xl font-bold mt-4">
+    ARCA
+  </h3>
 
 <label className="font-semibold">
   ARCA estimado
@@ -222,6 +224,8 @@ arca_payment_date: arcaPaymentDate || null,
   value={arcaPaymentDate}
   onChange={(e) => setArcaPaymentDate(e.target.value)}
 />
+</div>
+
 <label className="font-semibold">
   Notas
 </label>

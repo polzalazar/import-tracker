@@ -103,6 +103,23 @@ const usdPaid = usdPayments
   )
 
 const usdPending = usdCommitted - usdPaid
+const today = new Date().toISOString().split('T')[0]
+
+const overduePayments = payments.filter(
+  (payment) =>
+    payment.status !== 'Pagado' &&
+    payment.due_date &&
+    payment.due_date < today
+).length
+const upcomingPayments = payments
+  .filter(
+    (payment) =>
+      payment.status !== 'Pagado' &&
+      payment.due_date &&
+      payment.due_date >= today
+  )
+  .sort((a, b) => a.due_date.localeCompare(b.due_date))
+  .slice(0, 5)
     const filteredData = data.filter((item) => {
   const matchesSearch =
     item.code?.toLowerCase().includes(search.toLowerCase()) ||
@@ -203,8 +220,28 @@ const usdPending = usdCommitted - usdPaid
 
           <p className="text-3xl font-bold">
             {nextDeliveries}
-          </p>
-        </div>
+          </p></div>
+        <div
+  className={
+    overduePayments > 0
+      ? 'bg-red-100 rounded-2xl shadow p-5 border-2 border-red-500'
+      : 'bg-white rounded-2xl shadow p-5 border-2 border-gray-200'
+  }
+>
+  <p className="text-gray-500 text-sm">
+    Pagos vencidos
+  </p>
+
+  <p
+    className={
+      overduePayments > 0
+        ? 'text-3xl font-bold text-red-700'
+        : 'text-3xl font-bold text-gray-700'
+    }
+  >
+    {overduePayments}
+  </p>
+</div>
         <div className="bg-white rounded-2xl shadow p-5">
   <p className="text-gray-500 text-sm">
     USD comprometidos
@@ -234,11 +271,41 @@ const usdPending = usdCommitted - usdPaid
     {usdPending.toLocaleString()}
   </p>
 </div>
-      </div>
 
-      <h2 className="text-2xl font-bold mb-4">
-        Importaciones
-      </h2>
+</div>
+<div className="bg-white rounded-2xl shadow p-5 mb-6">
+  <h2 className="text-xl font-bold mb-4">
+    Próximos vencimientos
+  </h2>
+
+  {upcomingPayments.length > 0 ? (
+    <div className="space-y-3">
+      {upcomingPayments.map((payment) => (
+        <div
+          key={payment.id}
+          className="flex justify-between border-b pb-2 text-sm"
+        >
+          <span>
+            {formatDate(payment.due_date)} - {payment.concept}
+          </span>
+
+          <span className="font-bold">
+            {payment.currency === 'USD'
+              ? money(payment.amount, 'USD')
+              : money(payment.amount, 'ARS')}
+          </span>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p className="text-gray-500">
+      No hay vencimientos próximos.
+    </p>
+  )}
+</div>
+<h2 className="text-2xl font-bold mb-4">
+  Importaciones
+</h2>
       <div className="bg-white rounded-2xl shadow p-4 mb-6 flex flex-col md:flex-row gap-4">
   <input
     className="border p-3 rounded flex-1"
