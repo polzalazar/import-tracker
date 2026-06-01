@@ -59,7 +59,26 @@ setArcaPaymentDate(data.arca_payment_date || '')
 
     loadImport()
   }, [id])
+async function deleteImport() {
+  const confirmed = confirm(
+    '¿Eliminar esta importación?'
+  )
 
+  if (!confirmed) return
+
+  const { error } = await supabase
+    .from('imports')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    alert(error.message)
+    return
+  }
+
+  alert('Importación eliminada')
+  window.location.href = '/'
+}
   async function updateImport(e: React.FormEvent) {
     e.preventDefault()
 
@@ -235,7 +254,7 @@ arca_payment_date: arcaPaymentDate || null,
           onChange={(e) => setNotes(e.target.value)}
         />
 
-        <div className="flex gap-3">
+<div className="flex gap-3">
   <button className="bg-black text-white px-6 py-3 rounded-xl">
     Guardar cambios
   </button>
@@ -246,6 +265,14 @@ arca_payment_date: arcaPaymentDate || null,
   >
     Cancelar
   </a>
+
+  <button
+    type="button"
+    onClick={deleteImport}
+    className="bg-red-600 text-white px-6 py-3 rounded-xl"
+  >
+    Eliminar
+  </button>
 </div>
       </form>
 
