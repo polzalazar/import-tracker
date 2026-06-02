@@ -22,6 +22,7 @@ const [arcaEstimated, setArcaEstimated] = useState('')
 const [arcaStatus, setArcaStatus] = useState('Pendiente')
 const [arcaPaymentDate, setArcaPaymentDate] = useState('')
   const [payments, setPayments] = useState<any[]>([])
+  const [documents, setDocuments] = useState<any[]>([])
 
   useEffect(() => {
     async function loadImport() {
@@ -55,6 +56,13 @@ setArcaPaymentDate(data.arca_payment_date || '')
         .order('created_at', { ascending: false })
 
       setPayments(paymentsData || [])
+      const { data: documentsData } = await supabase
+  .from('documents')
+  .select('*')
+  .eq('import_id', id)
+  .order('created_at', { ascending: false })
+
+setDocuments(documentsData || [])
     }
 
     loadImport()
@@ -310,6 +318,51 @@ arca_payment_date: arcaPaymentDate || null,
           ))}
         </div>
       </div>
+      <div className="mt-10">
+  <h2 className="text-2xl font-bold mb-4">
+    Documentos relacionados
+  </h2>
+
+  <div className="space-y-4">
+    {documents.length > 0 ? (
+      documents.map((doc) => (
+        <div
+          key={doc.id}
+          className="bg-white rounded-2xl shadow p-5 flex justify-between items-center"
+        >
+          <div>
+            <h3 className="text-xl font-semibold">
+              {doc.document_type}
+            </h3>
+
+            <p className="text-gray-600">
+              Archivo: {doc.file_name}
+            </p>
+          </div>
+
+          <a
+            href={doc.file_url}
+            target="_blank"
+            className="bg-black text-white px-4 py-2 rounded-xl"
+          >
+            Ver archivo
+          </a>
+        </div>
+      ))
+    ) : (
+      <p className="text-gray-500">
+        No hay documentos cargados.
+      </p>
+    )}
+  </div>
+
+  <a
+    href="/documents"
+    className="inline-block mt-4 border px-6 py-3 rounded-xl"
+  >
+    Subir documento
+  </a>
+</div>
     </main>
   )
 }

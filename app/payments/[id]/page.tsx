@@ -38,7 +38,26 @@ export default function EditPaymentPage({
 
     loadPayment()
   }, [id])
+async function deletePayment() {
+  const confirmed = confirm(
+    '¿Eliminar este pago?'
+  )
 
+  if (!confirmed) return
+
+  const { error } = await supabase
+    .from('payments')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    alert(error.message)
+    return
+  }
+
+  alert('Pago eliminado')
+  window.location.href = '/payments'
+}
   async function updatePayment(
     e: React.FormEvent
   ) {
@@ -122,17 +141,25 @@ export default function EditPaymentPage({
         />
 
         <div className="flex gap-3">
-          <button className="bg-black text-white px-6 py-3 rounded-xl">
-            Guardar cambios
-          </button>
+  <button className="bg-black text-white px-6 py-3 rounded-xl">
+    Guardar cambios
+  </button>
 
-          <a
-            href="/payments"
-            className="border px-6 py-3 rounded-xl"
-          >
-            Cancelar
-          </a>
-        </div>
+  <a
+    href="/payments"
+    className="border px-6 py-3 rounded-xl"
+  >
+    Cancelar
+  </a>
+
+  <button
+    type="button"
+    onClick={deletePayment}
+    className="bg-red-600 text-white px-6 py-3 rounded-xl"
+  >
+    Eliminar
+  </button>
+</div>
       </form>
     </main>
   )
