@@ -93,14 +93,28 @@ async function deletePayment() {
         onSubmit={updatePayment}
         className="bg-white rounded-2xl shadow p-6 max-w-xl space-y-4"
       >
-        <input
-          className="w-full border p-3 rounded"
-          value={concept}
-          onChange={(e) =>
-            setConcept(e.target.value)
-          }
-        />
+    <select
+  className="w-full border p-3 rounded"
+  value={concept}
+  onChange={(e) => {
+    const selectedConcept = e.target.value
+    setConcept(selectedConcept)
 
+    if (selectedConcept === 'ARCA') {
+      setCurrency('ARS')
+    } else {
+      setCurrency('USD')
+    }
+  }}
+>
+  <option value="">SELECCIONAR CONCEPTO</option>
+  <option>ANTICIPO FABRICANTE</option>
+  <option>SALDO FABRICANTE</option>
+  <option>FLETE MARÍTIMO</option>
+  <option>ARCA</option>
+  <option>TERMINAL PORTUARIA</option>
+  <option>DESPACHANTE + CAMIÓN</option>
+</select>
         <input
           className="w-full border p-3 rounded"
           value={amount}

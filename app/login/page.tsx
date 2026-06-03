@@ -7,11 +7,14 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  async function login(e: React.FormEvent) {
-    e.preventDefault()
+  async function login() {
+    if (!email || !password) {
+      alert('Completá email y contraseña')
+      return
+    }
 
     const { error } = await supabase.auth.signInWithPassword({
-      email,
+      email: email.trim(),
       password,
     })
 
@@ -23,25 +26,38 @@ export default function LoginPage() {
     window.location.href = '/'
   }
 
-  async function register(e: React.FormEvent) {
-    e.preventDefault()
+  async function register() {
+    if (!email || !password) {
+      alert('Completá email y contraseña')
+      return
+    }
 
-    const { error } = await supabase.auth.signUp({
-      email,
+    if (password.length < 6) {
+      alert('La contraseña debe tener al menos 6 caracteres')
+      return
+    }
+
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim(),
       password,
     })
+
+    console.log(data)
 
     if (error) {
       alert('Error: ' + error.message)
       return
     }
 
-    alert('Usuario creado. Ahora podés ingresar.')
+    alert('Usuario creado correctamente. Ya puede ingresar.')
   }
 
   return (
     <main className="min-h-screen bg-gray-100 flex items-center justify-center p-10">
-      <form className="bg-white rounded-2xl shadow p-8 w-full max-w-md space-y-4">
+      <form
+        className="bg-white rounded-2xl shadow p-8 w-full max-w-md space-y-4"
+        onSubmit={(e) => e.preventDefault()}
+      >
         <h1 className="text-3xl font-bold mb-6">
           Ingresar
         </h1>
@@ -63,6 +79,7 @@ export default function LoginPage() {
         />
 
         <button
+          type="button"
           onClick={login}
           className="w-full bg-black text-white px-6 py-3 rounded-xl"
         >
@@ -70,6 +87,7 @@ export default function LoginPage() {
         </button>
 
         <button
+          type="button"
           onClick={register}
           className="w-full border px-6 py-3 rounded-xl"
         >

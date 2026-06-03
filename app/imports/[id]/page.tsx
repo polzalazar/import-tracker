@@ -178,18 +178,6 @@ arca_payment_date: arcaPaymentDate || null,
   onChange={(e) => setPossibleDeliveryDate(e.target.value)}
 />
 
-        <label className="font-semibold">
-  Riesgo
-</label>
-<select
-          className="w-full border p-3 rounded"
-          value={risk}
-          onChange={(e) => setRisk(e.target.value)}
-        >
-          <option>Bajo</option>
-          <option>Medio</option>
-          <option>Alto</option>
-        </select>
 
 <div className="border-2 border-gray-400 rounded-2xl p-4 bg-gray-100">
    <h3 className="text-xl font-bold mt-4">

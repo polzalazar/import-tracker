@@ -46,7 +46,8 @@ const [riskFilter, setRiskFilter] = useState('Riesgo')
         .from('imports')
 .select(`
   *,
-  payments (*)
+  payments (*),
+  documents (*)
 `)
         const { data: paymentsData } = await supabase
   .from('payments')
@@ -77,10 +78,6 @@ const [riskFilter, setRiskFilter] = useState('Riesgo')
       (item) => item.status !== 'Cerrado'
     ).length
 
-  const highRisk =
-    data.filter(
-      (item) => item.risk === 'Alto'
-    ).length
 
   const nextDeliveries =
     data.filter(
@@ -120,20 +117,16 @@ const upcomingPayments = payments
   )
   .sort((a, b) => a.due_date.localeCompare(b.due_date))
   .slice(0, 5)
-    const filteredData = data.filter((item) => {
+const filteredData = data.filter((item) => {
   const matchesSearch =
     item.code?.toLowerCase().includes(search.toLowerCase()) ||
     item.main_product?.toLowerCase().includes(search.toLowerCase())
 
   const matchesStatus =
-  statusFilter === 'Estado' ||
-  item.status?.toLowerCase() === statusFilter.toLowerCase()
+    statusFilter === 'Estado' ||
+    item.status?.toLowerCase() === statusFilter.toLowerCase()
 
-  const matchesRisk =
-  riskFilter === 'Riesgo' ||
-  item.risk?.toLowerCase() === riskFilter.toLowerCase()
-
-  return matchesSearch && matchesStatus && matchesRisk
+  return matchesSearch && matchesStatus
 })
 
   if (loading) {
@@ -200,16 +193,6 @@ const upcomingPayments = payments
 
           <p className="text-3xl font-bold">
             {active}
-          </p>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow p-5">
-          <p className="text-gray-500 text-sm">
-            Riesgo alto
-          </p>
-
-          <p className="text-3xl font-bold">
-            {highRisk}
           </p>
         </div>
 
@@ -333,16 +316,6 @@ const upcomingPayments = payments
     <option>Cerrado</option>
   </select>
 
-  <select
-    className="border p-3 rounded"
-    value={riskFilter}
-    onChange={(e) => setRiskFilter(e.target.value)}
-  >
-    <option>Riesgo</option>
-    <option>Bajo</option>
-    <option>Medio</option>
-    <option>Alto</option>
-  </select>
 </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -387,13 +360,82 @@ const upcomingPayments = payments
             <p className="mb-2">
               <b>Delivery posible:</b> {formatDate(item.possible_delivery_date)}
             </p>
-            <p className="mb-2">
-  <b>ARCA estimado:</b> {money(item.arca_estimated, 'ARS')}
-</p>
+            <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
+  <div className="bg-gray-50 rounded-xl p-3">
+    <p className="text-gray-500">Pagos</p>
+    <p className="font-bold">
+      {item.payments?.length || 0}
+    </p>
+  </div>
 
-<p className="mb-2">
-  <b>Fecha tentativa ARCA:</b> {formatDate(item.arca_payment_date)}
+  <div className="bg-gray-50 rounded-xl p-3">
+    <p className="text-gray-500">Documentos</p>
+    <p className="font-bold">
+  {item.documents?.length || 0}
 </p>
+  </div>
+</div>
+<div className="mt-3 bg-yellow-50 border border-yellow-200 rounded-xl p-3">
+  <p className="text-sm text-yellow-700 font-semibold mb-2">
+    Próximos pagos
+  </p>
+  <div className="grid grid-cols-[1fr_120px_110px] text-xs font-bold text-yellow-700 mb-2">
+  <span>CONCEPTO</span>
+  <span className="text-center">MONTO</span>
+  <span className="text-center">FECHA</span>
+</div>
+
+  {item.payments
+    ?.filter(
+      (payment) => payment.status !== 'Pagado'
+    )
+    .sort((a, b) =>
+      a.due_date.localeCompare(b.due_date)
+    )
+    .slice(0, 2)
+    .map((payment) => (
+<div
+  key={payment.id}
+  className={`grid grid-cols-[1fr_120px_110px_30px] text-sm mb-1 rounded px-2 py-1 ${
+    Math.ceil(
+      (new Date(payment.due_date + 'T00:00:00').getTime() - new Date().getTime()) /
+      (1000 * 60 * 60 * 24)
+    ) <= 7
+      ? 'bg-red-50'
+      : ''
+  }`}
+>
+  <span>
+    {payment.concept}
+  </span>
+
+  <span className="font-semibold text-center">
+    {payment.currency === 'USD'
+      ? `U$S ${Number(payment.amount || 0).toLocaleString('es-AR')}`
+      : `$ ${Number(payment.amount || 0).toLocaleString('es-AR')}`}
+  </span>
+
+  <span className="text-center">
+    {formatDate(payment.due_date)}
+  </span>
+
+  <span className="text-center text-red-600 text-lg font-bold">
+  {Math.ceil(
+    (new Date(payment.due_date + 'T00:00:00').getTime() - new Date().getTime()) /
+    (1000 * 60 * 60 * 24)
+  ) <= 7 && '⚠'}
+</span>
+</div>
+    ))}
+
+  {item.payments?.filter(
+    (payment) => payment.status !== 'Pagado'
+  ).length === 0 && (
+    <p className="text-sm text-gray-500">
+      Sin pagos pendientes
+    </p>
+  )}
+</div>
 <div className="mt-4 border-t pt-4">
   <p className="font-bold mb-2">💰 Fabricación</p>
 
@@ -426,15 +468,7 @@ const upcomingPayments = payments
   </p>
 </div>
 
-            <p className="mb-2">
-              <b>Riesgo:</b>{' '}
-              <span
-                className={`px-3 py-1 rounded-full text-sm ${riskClass(item.risk)}`}
-              >
-                {item.risk}
-              </span>
-            </p>
-            <div className="mt-4 border-t pt-4">
+<div className="mt-4 border-t pt-4">
   <p className="font-bold mb-2">Pagos</p>
 
 <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4 text-sm">
@@ -452,40 +486,74 @@ const upcomingPayments = payments
     </p>
   </div>
 
-  <div className="bg-gray-50 p-3 rounded-xl">
-    <p className="text-gray-500">Próximo venc.</p>
+<div className="bg-gray-50 p-3 rounded-xl">
+  <p className="text-gray-500">Próximo venc.</p>
+
+  {itemPayments
+    .filter((payment: any) => payment.status?.toLowerCase() !== 'pagado' && payment.due_date)
+    .sort((a: any, b: any) => a.due_date.localeCompare(b.due_date))[0] ? (
     <p className="font-bold">
-      {nextDue || 'Sin venc.'}
+      {formatDate(
+        itemPayments
+          .filter((payment: any) => payment.status?.toLowerCase() !== 'pagado' && payment.due_date)
+          .sort((a: any, b: any) => a.due_date.localeCompare(b.due_date))[0].due_date
+      )}
+      {' - '}
+      {itemPayments
+        .filter((payment: any) => payment.status?.toLowerCase() !== 'pagado' && payment.due_date)
+        .sort((a: any, b: any) => a.due_date.localeCompare(b.due_date))[0].currency === 'USD'
+        ? `U$S ${Number(
+            itemPayments
+              .filter((payment: any) => payment.status?.toLowerCase() !== 'pagado' && payment.due_date)
+              .sort((a: any, b: any) => a.due_date.localeCompare(b.due_date))[0].amount || 0
+          ).toLocaleString('es-AR')}`
+        : `$ ${Number(
+            itemPayments
+              .filter((payment: any) => payment.status?.toLowerCase() !== 'pagado' && payment.due_date)
+              .sort((a: any, b: any) => a.due_date.localeCompare(b.due_date))[0].amount || 0
+          ).toLocaleString('es-AR')}`}
     </p>
-  </div>
+  ) : (
+    <p className="font-bold">
+      Sin venc.
+    </p>
+  )}
+</div>
 </div>
 
 {item.payments?.length > 0 ? (
   <div className="space-y-2">
     {item.payments.map((payment: any) => (
-      <div
-        key={payment.id}
-        className="flex justify-between text-sm"
-      >
-        <span>
-          {payment.concept} - {payment.due_date}
-        </span>
+<div
+  key={payment.id}
+  className={`grid grid-cols-[1fr_120px_110px_30px] text-sm mb-1 rounded px-2 py-1 ${
+    Math.ceil(
+      (new Date(payment.due_date + 'T00:00:00').getTime() - new Date().getTime()) /
+      (1000 * 60 * 60 * 24)
+    ) <= 7
+      ? 'bg-red-50'
+      : ''
+  }`}
+>
+  <span>
+    {payment.concept}
+  </span>
 
-        <span
-          className={
-            payment.status === 'Pagado'
-              ? 'text-green-600 font-semibold'
-              : 'text-red-600 font-semibold'
-          }
-        >
-          {payment.status} {payment.currency} {payment.amount}
-        </span>
-      </div>
+  <span className="font-semibold text-center">
+    {payment.currency === 'USD'
+      ? `U$S ${Number(payment.amount || 0).toLocaleString('es-AR')}`
+      : `$ ${Number(payment.amount || 0).toLocaleString('es-AR')}`}
+  </span>
+
+  <span className="text-center">
+    {formatDate(payment.due_date)}
+  </span>
+</div>
     ))}
   </div>
 ) : (
-  <p className="text-gray-500 text-sm">
-    Sin pagos cargados
+  <p className="text-gray-500">
+    No hay pagos cargados.
   </p>
 )}
 </div>
@@ -494,12 +562,27 @@ const upcomingPayments = payments
   {item.notes}
 </div>
 
-<a
-  href={`/imports/${item.id}`}
-  className="inline-block mt-4 bg-black text-white px-4 py-2 rounded-xl"
+<div className="flex gap-3 mt-4">
+  <a
+    href={`/imports/${item.id}`}
+    className="bg-black text-white px-4 py-2 rounded-xl"
+  >
+    Editar
+  </a>
+
+  <a
+    href={`/imports/${item.id}/documents`}
+    className="border px-4 py-2 rounded-xl"
+  >
+    Ver documentos
+  </a>
+  <a
+  href={`/payments?importId=${item.id}`}
+  className="border px-4 py-2 rounded-xl"
 >
-  Editar
+  PAGOS
 </a>
+</div>
 </div>
   )
 })}

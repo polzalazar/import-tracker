@@ -1,9 +1,20 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
+function conceptClass(concept: string) {
+  if (concept === 'ANTICIPO FABRICANTE') return 'bg-green-100 text-green-700'
+ if (concept === 'SALDO FABRICANTE') return 'bg-purple-100 text-purple-700'
+if (concept === 'FLETE MARÍTIMO') return 'bg-blue-100 text-blue-700'
+  if (concept === 'ARCA') return 'bg-orange-100 text-orange-700'
+  if (concept === 'TERMINAL PORTUARIA') return 'bg-gray-200 text-gray-800'
+  if (concept === 'DESPACHANTE + CAMIÓN') return 'bg-yellow-100 text-yellow-700'
 
+  return 'bg-gray-100 text-gray-700'
+}
 export default function PaymentsPage() {
+    const searchParams = useSearchParams()
   const [payments, setPayments] = useState<any[]>([])
   const [imports, setImports] = useState<any[]>([])
 
@@ -15,19 +26,33 @@ export default function PaymentsPage() {
   const [status, setStatus] = useState('Pendiente')
 
   useEffect(() => {
-    loadData()
-  }, [])
+  const importIdFromUrl = searchParams.get('importId')
+
+  if (importIdFromUrl) {
+    setImportId(importIdFromUrl)
+  }
+
+  loadData()
+}, [searchParams])
 
   async function loadData() {
-    const { data: paymentsData } = await supabase
-      .from('payments')
-      .select(`
-        *,
-        imports (
-          code
-        )
-      `)
-      .order('created_at', { ascending: false })
+    const importIdFromUrl = searchParams.get('importId')
+
+let paymentsQuery = supabase
+  .from('payments')
+  .select(`
+    *,
+    imports (
+      code
+    )
+  `)
+  .order('created_at', { ascending: false })
+
+if (importIdFromUrl) {
+  paymentsQuery = paymentsQuery.eq('import_id', importIdFromUrl)
+}
+
+const { data: paymentsData } = await paymentsQuery
 
     const { data: importsData } = await supabase
       .from('imports')
@@ -101,13 +126,28 @@ export default function PaymentsPage() {
           ))}
         </select>
 
-        <input
-          className="border p-3 rounded"
-          placeholder="Concepto"
-          value={concept}
-          onChange={(e) => setConcept(e.target.value)}
-        />
+        <select
+  className="w-full border p-3 rounded"
+  value={concept}
+  onChange={(e) => {
+  const selectedConcept = e.target.value
+  setConcept(selectedConcept)
 
+  if (selectedConcept === 'ARCA') {
+    setCurrency('ARS')
+  } else {
+    setCurrency('USD')
+  }
+}}
+>
+  <option value="">SELECCIONAR CONCEPTO</option>
+  <option>ANTICIPO FABRICANTE</option>
+  <option>SALDO FABRICANTE</option>
+  <option>FLETE MARÍTIMO</option>
+  <option>DESPACHANTE + CAMIÓN</option>
+  <option>ARCA</option>
+  <option>TERMINAL PORTUARIA</option>
+</select>
         <input
           className="border p-3 rounded"
           placeholder="Monto"
@@ -156,9 +196,11 @@ export default function PaymentsPage() {
           >
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-2xl font-semibold">
-                  {payment.concept}
-                </h2>
+                <div
+  className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${conceptClass(payment.concept)}`}
+>
+  {payment.concept}
+</div>
 
                 <p className="text-gray-600">
                   Importación:{' '}
