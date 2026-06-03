@@ -380,13 +380,13 @@ const filteredData = data.filter((item) => {
 
   {item.payments
     ?.filter(
-      (payment) => payment.status !== 'Pagado'
+      (payment: any) => payment.status !== 'Pagado'
     )
-    .sort((a, b) =>
+    .sort((a: any, b: any) =>
       a.due_date.localeCompare(b.due_date)
     )
     .slice(0, 2)
-    .map((payment) => (
+    .map((payment: any) => (
 <div
   key={payment.id}
   className={`grid grid-cols-[1fr_120px_110px_30px] text-sm mb-1 rounded px-2 py-1 ${
