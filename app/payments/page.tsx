@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+
 import { supabase } from '../../lib/supabase'
 function conceptClass(concept: string) {
   if (concept === 'ANTICIPO FABRICANTE') return 'bg-green-100 text-green-700'
@@ -14,7 +14,7 @@ if (concept === 'FLETE MARÍTIMO') return 'bg-blue-100 text-blue-700'
   return 'bg-gray-100 text-gray-700'
 }
 export default function PaymentsPage() {
-    const searchParams = useSearchParams()
+
   const [payments, setPayments] = useState<any[]>([])
   const [imports, setImports] = useState<any[]>([])
 
@@ -25,18 +25,18 @@ export default function PaymentsPage() {
   const [dueDate, setDueDate] = useState('')
   const [status, setStatus] = useState('Pendiente')
 
-  useEffect(() => {
-  const importIdFromUrl = searchParams.get('importId')
+useEffect(() => {
+  const importIdFromUrl = new URLSearchParams(window.location.search).get('importId')
 
   if (importIdFromUrl) {
     setImportId(importIdFromUrl)
   }
 
   loadData()
-}, [searchParams])
+}, [])
 
   async function loadData() {
-    const importIdFromUrl = searchParams.get('importId')
+const importIdFromUrl = new URLSearchParams(window.location.search).get('importId')
 
 let paymentsQuery = supabase
   .from('payments')
