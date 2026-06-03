@@ -249,35 +249,45 @@ const filteredData = data.filter((item) => {
 </div>
 
 </div>
-<div className="bg-white rounded-2xl shadow p-5 mb-6">
+<div className="bg-white rounded-2xl shadow p-5 mb-6 max-w-5xl">
   <h2 className="text-xl font-bold mb-4">
     Próximos vencimientos
   </h2>
 
-  {upcomingPayments.length > 0 ? (
-    <div className="space-y-3">
-      {upcomingPayments.map((payment) => (
-        <div
-          key={payment.id}
-          className="flex justify-between border-b pb-2 text-sm"
-        >
-          <span>
-            {formatDate(payment.due_date)} - {payment.concept}
+{upcomingPayments.length > 0 ? (
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    {upcomingPayments.slice(0, 3).map((payment: any) => (
+      <div
+        key={payment.id}
+        className="border rounded-xl p-4 bg-gray-50"
+      >
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm text-gray-500">
+            {formatDate(payment.due_date)}
           </span>
 
-          <span className="font-bold">
-            {payment.currency === 'USD'
-              ? money(payment.amount, 'USD')
-              : money(payment.amount, 'ARS')}
+          <span className="text-red-600 text-lg">
+        
           </span>
         </div>
-      ))}
-    </div>
-  ) : (
-    <p className="text-gray-500">
-      No hay vencimientos próximos.
-    </p>
-  )}
+
+        <p className="font-semibold text-sm mb-2">
+          {payment.concept}
+        </p>
+
+        <p className="text-lg font-bold">
+          {payment.currency === 'USD'
+            ? money(payment.amount, 'USD')
+            : money(payment.amount, 'ARS')}
+        </p>
+      </div>
+    ))}
+  </div>
+) : (
+  <p className="text-gray-500">
+    No hay vencimientos próximos.
+  </p>
+)}
 </div>
 <h2 className="text-2xl font-bold mb-4">
   Importaciones
