@@ -422,7 +422,7 @@ const filteredData = data.filter((item) => {
     ))}
 
   {item.payments?.filter(
-    (payment) => payment.status !== 'Pagado'
+    (payment: any) => payment.status !== 'Pagado'
   ).length === 0 && (
     <p className="text-sm text-gray-500">
       Sin pagos pendientes
