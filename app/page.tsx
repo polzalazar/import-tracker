@@ -3,12 +3,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
-function riskClass(risk: string) {
-  if (risk === 'Bajo') return 'bg-green-100 text-green-700'
-  if (risk === 'Medio') return 'bg-yellow-100 text-yellow-700'
-  if (risk === 'Alto') return 'bg-red-100 text-red-700'
-  return 'bg-gray-100 text-gray-700'
-}
 function money(value: any, currency: 'USD' | 'ARS') {
   const number = Number(value || 0)
 
@@ -31,7 +25,6 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
 const [statusFilter, setStatusFilter] = useState('Estado')
-const [riskFilter, setRiskFilter] = useState('Riesgo')
 
   useEffect(() => {
     async function loadData() {
