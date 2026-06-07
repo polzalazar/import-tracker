@@ -113,7 +113,8 @@ async function deletePayment() {
   <option>FLETE MARÍTIMO</option>
   <option>ARCA</option>
   <option>TERMINAL PORTUARIA</option>
-  <option>DESPACHANTE + CAMIÓN</option>
+  <option>DESPACHANTE</option>
+  <option>CAMIÓN</option>
 </select>
         <input
           className="w-full border p-3 rounded"

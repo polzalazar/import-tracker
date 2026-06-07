@@ -9,7 +9,8 @@ function conceptClass(concept: string) {
 if (concept === 'FLETE MARÍTIMO') return 'bg-blue-100 text-blue-700'
   if (concept === 'ARCA') return 'bg-orange-100 text-orange-700'
   if (concept === 'TERMINAL PORTUARIA') return 'bg-gray-200 text-gray-800'
-  if (concept === 'DESPACHANTE + CAMIÓN') return 'bg-yellow-100 text-yellow-700'
+  if (concept === 'DESPACHANTE') return 'bg-yellow-100 text-yellow-700'
+  if (concept === 'CAMIÓN') return 'bg-yellow-100 text-yellow-700'
 
   return 'bg-gray-100 text-gray-700'
 }
@@ -144,7 +145,8 @@ const { data: paymentsData } = await paymentsQuery
   <option>ANTICIPO FABRICANTE</option>
   <option>SALDO FABRICANTE</option>
   <option>FLETE MARÍTIMO</option>
-  <option>DESPACHANTE + CAMIÓN</option>
+  <option>DESPACHANTE</option>
+  <option>CAMIÓN</option>
   <option>ARCA</option>
   <option>TERMINAL PORTUARIA</option>
 </select>

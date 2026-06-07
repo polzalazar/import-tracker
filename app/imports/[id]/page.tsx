@@ -13,6 +13,8 @@ export default function EditImportPage({
   const [code, setCode] = useState('')
   const [mainProduct, setMainProduct] = useState('')
   const [status, setStatus] = useState('')
+  const [orderDate, setOrderDate] = useState('')
+  const [sailingDate, setSailingDate] = useState('')
   const [etaPort, setEtaPort] = useState('')
   const [possibleDeliveryDate, setPossibleDeliveryDate] = useState('')
   const [risk, setRisk] = useState('')
@@ -40,6 +42,8 @@ const [arcaPaymentDate, setArcaPaymentDate] = useState('')
       setCode(data.code || '')
       setMainProduct(data.main_product || '')
       setStatus(data.status || '')
+      setOrderDate(data.order_date || '')
+      setSailingDate(data.sailing_date || '')
       setEtaPort(data.eta_port || '')
       setPossibleDeliveryDate(data.possible_delivery_date || '')
       setRisk(data.risk || '')
@@ -96,6 +100,8 @@ async function deleteImport() {
         code,
         main_product: mainProduct,
         status,
+        order_date: orderDate || null,
+        sailing_date: sailingDate || null,
         eta_port: etaPort || null,
         possible_delivery_date: possibleDeliveryDate || null,
        risk,
@@ -156,10 +162,23 @@ arca_payment_date: arcaPaymentDate || null,
           <option>Cerrado</option>
         </select>
 
-       <label className="font-semibold">
-  ETA Puerto
-</label>
+       <label className="font-semibold">Fecha pago orden de compra</label>
+<input
+  type="date"
+  className="w-full border p-3 rounded"
+  value={orderDate}
+  onChange={(e) => setOrderDate(e.target.value)}
+/>
 
+<label className="font-semibold">Fecha de zarpe</label>
+<input
+  type="date"
+  className="w-full border p-3 rounded"
+  value={sailingDate}
+  onChange={(e) => setSailingDate(e.target.value)}
+/>
+
+<label className="font-semibold">ETA Puerto</label>
 <input
   type="date"
   className="w-full border p-3 rounded"
