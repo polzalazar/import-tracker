@@ -16,17 +16,17 @@ function formatDate(date: string) {
 
 function statusConfig(status: string) {
   const map: Record<string, { color: string; bg: string; dot: string }> = {
-    'Pedido confirmado': { color: '#94a3b8', bg: 'rgba(148,163,184,0.1)', dot: '#94a3b8' },
-    'En fabricación':   { color: '#fbbf24', bg: 'rgba(251,191,36,0.1)',  dot: '#fbbf24' },
-    'Listo para embarcar': { color: '#a78bfa', bg: 'rgba(167,139,250,0.1)', dot: '#a78bfa' },
-    'Embarcado':        { color: '#818cf8', bg: 'rgba(129,140,248,0.1)', dot: '#818cf8' },
-    'En tránsito':      { color: '#38bdf8', bg: 'rgba(56,189,248,0.1)',  dot: '#38bdf8' },
-    'Arribado':         { color: '#fb923c', bg: 'rgba(251,146,60,0.1)',  dot: '#fb923c' },
-    'En aduana':        { color: '#f87171', bg: 'rgba(248,113,113,0.1)', dot: '#f87171' },
-    'Nacionalizado':    { color: '#22d3ee', bg: 'rgba(34,211,238,0.1)',  dot: '#22d3ee' },
-    'En depósito':      { color: '#2dd4bf', bg: 'rgba(45,212,191,0.1)',  dot: '#2dd4bf' },
-    'Disponible':       { color: '#4ade80', bg: 'rgba(74,222,128,0.1)',  dot: '#4ade80' },
-    'Cerrado':          { color: '#475569', bg: 'rgba(71,85,105,0.1)',   dot: '#475569' },
+    'Pedido confirmado':    { color: '#64748b', bg: 'rgba(100,116,139,0.1)', dot: '#64748b' },
+    'En fabricación':      { color: '#d97706', bg: 'rgba(217,119,6,0.1)',   dot: '#d97706' },
+    'Listo para embarcar': { color: '#7c3aed', bg: 'rgba(124,58,237,0.1)', dot: '#7c3aed' },
+    'Embarcado':           { color: '#4f46e5', bg: 'rgba(79,70,229,0.1)',   dot: '#4f46e5' },
+    'En tránsito':         { color: '#0891b2', bg: 'rgba(8,145,178,0.1)',   dot: '#0891b2' },
+    'Arribado':            { color: '#f97316', bg: 'rgba(249,115,22,0.1)',  dot: '#f97316' },
+    'En aduana':           { color: '#dc2626', bg: 'rgba(220,38,38,0.1)',   dot: '#dc2626' },
+    'Nacionalizado':       { color: '#0891b2', bg: 'rgba(8,145,178,0.1)',   dot: '#0891b2' },
+    'En depósito':         { color: '#0d9488', bg: 'rgba(13,148,136,0.1)', dot: '#0d9488' },
+    'Disponible':          { color: '#16a34a', bg: 'rgba(22,163,74,0.1)',   dot: '#16a34a' },
+    'Cerrado':             { color: '#94a3b8', bg: 'rgba(148,163,184,0.1)', dot: '#94a3b8' },
   }
   return map[status] || { color: '#94a3b8', bg: 'rgba(148,163,184,0.1)', dot: '#94a3b8' }
 }
@@ -102,7 +102,7 @@ export default function Home() {
       <main style={styles.page}>
         <div style={styles.loadingWrap}>
           <div style={styles.loadingDot} />
-          <span style={{ color: '#22d3ee', fontFamily: 'monospace', fontSize: 18, letterSpacing: 4 }}>CARGANDO SISTEMA</span>
+          <span style={{ color: '#0891b2', fontFamily: 'monospace', fontSize: 18, letterSpacing: 4 }}>CARGANDO SISTEMA</span>
         </div>
       </main>
     )
@@ -119,9 +119,9 @@ export default function Home() {
         </div>
         <nav style={styles.nav}>
           <a href="/new-import" style={styles.btnPrimary}>+ Nueva importación</a>
-          <a href="/documents" style={{ ...styles.btnGhost, color: '#a78bfa', border: '1px solid rgba(167,139,250,0.4)', background: 'rgba(167,139,250,0.05)' }}>Documentos</a>
-          <a href="/payments" style={{ ...styles.btnGhost, color: '#fbbf24', border: '1px solid rgba(251,191,36,0.4)', background: 'rgba(251,191,36,0.05)' }}>Pagos</a>
-          <button onClick={logout} style={{ ...styles.btnGhost, cursor: 'pointer', border: '1px solid rgba(248,113,113,0.4)', color: '#f87171', background: 'rgba(248,113,113,0.05)' }}>
+          <a href="/documents" style={{ ...styles.btnGhost, color: '#7c3aed', borderColor: 'rgba(124,58,237,0.4)', background: 'rgba(124,58,237,0.06)' }}>Documentos</a>
+          <a href="/payments" style={{ ...styles.btnGhost, color: '#d97706', borderColor: 'rgba(217,119,6,0.4)', background: 'rgba(217,119,6,0.06)' }}>Pagos</a>
+          <button onClick={logout} style={{ ...styles.btnGhost, cursor: 'pointer', borderColor: 'rgba(220,38,38,0.4)', color: '#dc2626', background: 'rgba(220,38,38,0.06)' }}>
             Salir
           </button>
         </nav>
@@ -129,13 +129,13 @@ export default function Home() {
 
       {/* KPI STRIP */}
       <section style={styles.kpiStrip}>
-        <KpiCard label="Total importaciones" value={total} accent="#38bdf8" icon="▦" />
-        <KpiCard label="Activas" value={active} accent="#4ade80" icon="◉" />
-        <KpiCard label="Con delivery estimado" value={nextDeliveries} accent="#a78bfa" icon="◎" />
+        <KpiCard label="Total importaciones" value={total} accent="#0891b2" icon="▦" />
+        <KpiCard label="Activas" value={active} accent="#16a34a" icon="◉" />
+        <KpiCard label="Con delivery estimado" value={nextDeliveries} accent="#7c3aed" icon="◎" />
         <KpiCard
           label="Pagos vencidos"
           value={overduePayments}
-          accent={overduePayments > 0 ? '#f87171' : '#4ade80'}
+          accent={overduePayments > 0 ? '#dc2626' : '#16a34a'}
           icon={overduePayments > 0 ? '⚠' : '✓'}
           alert={overduePayments > 0}
         />
@@ -145,9 +145,9 @@ export default function Home() {
       <section style={styles.section}>
         <SectionTitle>Resumen financiero</SectionTitle>
         <div style={styles.finGrid}>
-          <FinCard label="USD PAGADO"    amount={money(usdPaid, 'USD')}    accent="#4ade80" />
-          <FinCard label="USD PENDIENTE" amount={money(usdPending, 'USD')} accent="#fb923c" />
-          <FinCard label="ARS PENDIENTE" amount={money(arsPending, 'ARS')} accent="#f87171" />
+          <FinCard label="USD PAGADO"    amount={money(usdPaid, 'USD')}    accent="#16a34a" />
+          <FinCard label="USD PENDIENTE" amount={money(usdPending, 'USD')} accent="#f97316" />
+          <FinCard label="ARS PENDIENTE" amount={money(arsPending, 'ARS')} accent="#dc2626" />
         </div>
       </section>
 
@@ -163,19 +163,19 @@ export default function Home() {
                   const amount = payment.currency === 'USD' ? money(payment.amount, 'USD') : money(payment.amount, 'ARS')
                   return (
                     <div key={payment.id} style={styles.upcomingRow}>
-                      <span style={{ color: '#fdba74', fontFamily: 'monospace', fontSize: 21, fontWeight: 700, minWidth: 150, letterSpacing: 1 }}>
+                      <span style={{ color: '#d97706', fontFamily: 'monospace', fontSize: 18, fontWeight: 700, minWidth: 150, letterSpacing: 1 }}>
                         {new Date(payment.due_date + 'T00:00:00').toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase()}
                       </span>
-                      <span style={{ color: '#22d3ee', fontFamily: 'monospace', fontSize: 21, fontWeight: 700, minWidth: 110 }}>{importCode}</span>
-                      <span style={{ color: '#cbd5e1', fontFamily: 'monospace', fontSize: 21, flex: 1 }}>{payment.concept}</span>
-                      <span style={{ color: payment.currency === 'USD' ? '#22d3ee' : '#f87171', fontFamily: 'monospace', fontSize: 21, fontWeight: 700 }}>{amount}</span>
+                      <span style={{ color: '#0891b2', fontFamily: 'monospace', fontSize: 18, fontWeight: 700, minWidth: 110 }}>{importCode}</span>
+                      <span style={{ color: '#475569', fontFamily: 'monospace', fontSize: 18, flex: 1 }}>{payment.concept}</span>
+                      <span style={{ color: payment.currency === 'USD' ? '#0891b2' : '#dc2626', fontFamily: 'monospace', fontSize: 18, fontWeight: 700 }}>{amount}</span>
                     </div>
                   )
                 })}
               </div>
             </div>
           )}
-          <div style={{ flex: '0 0 420px', minWidth: 300, background: 'rgba(15,23,42,0.6)', border: '1px solid rgba(34,211,238,0.08)', borderRadius: 8, padding: '14px 18px' }}>
+          <div style={{ flex: '0 0 420px', minWidth: 300, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 8, padding: '14px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
             <SectionTitle>Pagos pendientes / mes</SectionTitle>
             <MonthlyPaymentsChart payments={payments} />
           </div>
@@ -187,7 +187,7 @@ export default function Home() {
         <SectionTitle>Importaciones</SectionTitle>
         <div style={styles.filterBar}>
           <div style={styles.searchWrap}>
-            <span style={{ color: '#475569', fontSize: 17, marginRight: 8 }}>⌕</span>
+            <span style={{ color: '#94a3b8', fontSize: 17, marginRight: 8 }}>⌕</span>
             <input
               style={styles.searchInput}
               placeholder="Buscar por código o producto..."
@@ -215,10 +215,10 @@ export default function Home() {
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 2px; }
-        input::placeholder { color: #334155; }
-        option { background: #0f172a; color: #94a3b8; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+        input::placeholder { color: #94a3b8; }
+        option { background: #ffffff; color: #0f172a; }
       `}</style>
     </main>
   )
@@ -230,12 +230,12 @@ function KpiCard({ label, value, accent, icon, alert = false }: any) {
   return (
     <div style={{
       ...styles.kpiCard,
-      borderColor: alert ? 'rgba(248,113,113,0.5)' : 'rgba(34,211,238,0.12)',
-      background: alert ? 'rgba(248,113,113,0.05)' : 'rgba(15,23,42,0.8)',
+      borderColor: alert ? 'rgba(220,38,38,0.4)' : '#e2e8f0',
+      background: alert ? 'rgba(220,38,38,0.03)' : '#ffffff',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-        <span style={{ fontSize: 14, color: '#475569', textTransform: 'uppercase' as const, letterSpacing: 2 }}>{label}</span>
-        <span style={{ fontSize: 18, color: accent, opacity: 0.7 }}>{icon}</span>
+        <span style={{ fontSize: 13, color: '#94a3b8', textTransform: 'uppercase' as const, letterSpacing: 2, fontFamily: 'monospace' }}>{label}</span>
+        <span style={{ fontSize: 18, color: accent, opacity: 0.8 }}>{icon}</span>
       </div>
       <span style={{ fontSize: 42, fontWeight: 700, fontFamily: 'monospace', color: accent, letterSpacing: -1, lineHeight: 1 }}>{value}</span>
     </div>
@@ -245,9 +245,9 @@ function KpiCard({ label, value, accent, icon, alert = false }: any) {
 function FinCard({ label, amount, accent }: any) {
   return (
     <div style={styles.finCard}>
-      <span style={{ fontSize: 16, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: 3, marginBottom: 8, display: 'block' }}>{label}</span>
+      <span style={{ fontSize: 13, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 3, marginBottom: 8, display: 'block', fontFamily: 'monospace' }}>{label}</span>
       <span style={{ fontSize: 26, fontWeight: 700, fontFamily: 'monospace', color: accent }}>{amount}</span>
-      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, transparent, ${accent}40, transparent)` }} />
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, transparent, ${accent}60, transparent)` }} />
     </div>
   )
 }
@@ -255,8 +255,8 @@ function FinCard({ label, amount, accent }: any) {
 function SectionTitle({ children }: any) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-      <span style={{ color: '#22d3ee', fontSize: 13, letterSpacing: 4, textTransform: 'uppercase', fontFamily: 'monospace' }}>◈ {children}</span>
-      <div style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, rgba(34,211,238,0.3), transparent)' }} />
+      <span style={{ color: '#0891b2', fontSize: 12, letterSpacing: 4, textTransform: 'uppercase', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>◈ {children}</span>
+      <div style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, rgba(8,145,178,0.3), transparent)' }} />
     </div>
   )
 }
@@ -283,14 +283,13 @@ function ImportCard({ item, today }: any) {
     : etaDiff <= 7 ? `Arriba en ${etaDiff}d`
     : `Faltan ${etaDiff}d`
 
-  const etaColor = etaDiff === null ? '#475569'
-    : etaDiff < 0 ? '#fb923c'
-    : etaDiff <= 7 ? '#f87171'
-    : '#22d3ee'
+  const etaColor = etaDiff === null ? '#94a3b8'
+    : etaDiff < 0 ? '#f97316'
+    : etaDiff <= 7 ? '#dc2626'
+    : '#0891b2'
 
   const st = statusConfig(item.status)
 
-  // Order progress bar (order payment → possible delivery)
   const orderPct = (() => {
     if (!item.order_date || !item.possible_delivery_date) return null
     const start = new Date(item.order_date              + 'T00:00:00').getTime()
@@ -300,7 +299,6 @@ function ImportCard({ item, today }: any) {
     return Math.max(0, Math.min(100, ((now - start) / (end - start)) * 100))
   })()
 
-  // Maritime progress bar
   const sailingPct = (() => {
     if (!item.sailing_date || !item.eta_port) return null
     const sail = new Date(item.sailing_date + 'T00:00:00').getTime()
@@ -311,9 +309,9 @@ function ImportCard({ item, today }: any) {
   })()
 
   const semaphoreConfig = {
-    alert: { color: '#f87171', label: 'Acción requerida', char: '⚠' },
-    warn:  { color: '#fbbf24', label: 'Próximo vencimiento', char: '◉' },
-    ok:    { color: '#4ade80', label: 'Todo al día', char: '✓' },
+    alert: { color: '#dc2626', label: 'Acción requerida', char: '⚠' },
+    warn:  { color: '#d97706', label: 'Próximo vencimiento', char: '◉' },
+    ok:    { color: '#16a34a', label: 'Todo al día', char: '✓' },
   }[semaphore]
 
   const pendingForCard = itemPayments
@@ -326,14 +324,14 @@ function ImportCard({ item, today }: any) {
       {/* Card header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
         <div>
-          <span style={{ fontFamily: 'monospace', fontSize: 24, fontWeight: 700, color: '#e2e8f0', letterSpacing: 1 }}>{item.code}</span>
+          <span style={{ fontFamily: 'monospace', fontSize: 22, fontWeight: 700, color: '#0f172a', letterSpacing: 1 }}>{item.code}</span>
           <div style={{ marginTop: 6 }}>
-            <span style={{ fontSize: 14, color: semaphoreConfig.color, background: `${semaphoreConfig.color}15`, border: `1px solid ${semaphoreConfig.color}30`, borderRadius: 3, padding: '3px 10px', fontFamily: 'monospace', letterSpacing: 1 }}>
+            <span style={{ fontSize: 13, color: semaphoreConfig.color, background: `${semaphoreConfig.color}12`, border: `1px solid ${semaphoreConfig.color}30`, borderRadius: 3, padding: '3px 10px', fontFamily: 'monospace', letterSpacing: 1 }}>
               {semaphoreConfig.char} {semaphoreConfig.label.toUpperCase()}
             </span>
           </div>
         </div>
-        <span style={{ fontSize: 14, color: st.color, background: st.bg, border: `1px solid ${st.color}40`, borderRadius: 3, padding: '4px 12px', fontFamily: 'monospace', letterSpacing: 1, whiteSpace: 'nowrap' }}>
+        <span style={{ fontSize: 13, color: st.color, background: st.bg, border: `1px solid ${st.color}40`, borderRadius: 3, padding: '4px 12px', fontFamily: 'monospace', letterSpacing: 1, whiteSpace: 'nowrap' }}>
           {item.status}
         </span>
       </div>
@@ -341,14 +339,14 @@ function ImportCard({ item, today }: any) {
       {/* Order progress bar */}
       {orderPct !== null && (
         <div style={{ marginBottom: 10 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: 14, fontFamily: 'monospace', color: '#94a3b8', letterSpacing: 1 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: 13, fontFamily: 'monospace', color: '#94a3b8', letterSpacing: 1 }}>
             <span>📋 {formatDate(item.order_date)}</span>
-            <span style={{ color: orderPct >= 100 ? '#f87171' : '#fb923c', fontWeight: 700 }}>PRODUCCIÓN &nbsp;{Math.round(orderPct)}%</span>
+            <span style={{ color: orderPct >= 100 ? '#dc2626' : '#f97316', fontWeight: 700 }}>PRODUCCIÓN &nbsp;{Math.round(orderPct)}%</span>
             <span>📦 {formatDate(item.possible_delivery_date)}</span>
           </div>
-          <div style={{ position: 'relative', height: 12, background: 'rgba(251,146,60,0.08)', borderRadius: 6, overflow: 'visible' }}>
+          <div style={{ position: 'relative', height: 12, background: 'rgba(249,115,22,0.1)', borderRadius: 6, overflow: 'visible' }}>
             <div style={{ position: 'absolute', left: 0, width: `${orderPct}%`, height: '100%', background: 'linear-gradient(90deg,#f97316,#fbbf24)', borderRadius: 6, transition: 'width 0.3s' }} />
-            <div style={{ position: 'absolute', left: `${Math.min(orderPct, 99)}%`, top: -4, width: 4, height: 20, background: '#f87171', borderRadius: 2, boxShadow: '0 0 8px #f87171' }} />
+            <div style={{ position: 'absolute', left: `${Math.min(orderPct, 99)}%`, top: -4, width: 4, height: 20, background: '#dc2626', borderRadius: 2, boxShadow: '0 0 6px rgba(220,38,38,0.5)' }} />
           </div>
         </div>
       )}
@@ -356,25 +354,25 @@ function ImportCard({ item, today }: any) {
       {/* Maritime progress bar */}
       {sailingPct !== null && (
         <div style={{ marginBottom: 14 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: 14, fontFamily: 'monospace', color: '#94a3b8', letterSpacing: 1 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: 13, fontFamily: 'monospace', color: '#94a3b8', letterSpacing: 1 }}>
             <span>⚓ {formatDate(item.sailing_date)}</span>
-            <span style={{ color: sailingPct >= 100 ? '#fb923c' : '#22d3ee', fontWeight: 700 }}>TRÁNSITO &nbsp;{Math.round(sailingPct)}%</span>
+            <span style={{ color: sailingPct >= 100 ? '#f97316' : '#0891b2', fontWeight: 700 }}>TRÁNSITO &nbsp;{Math.round(sailingPct)}%</span>
             <span>🏁 {formatDate(item.eta_port)}</span>
           </div>
-          <div style={{ position: 'relative', height: 12, background: 'rgba(34,211,238,0.08)', borderRadius: 6, overflow: 'visible' }}>
-            <div style={{ position: 'absolute', left: 0, width: `${sailingPct}%`, height: '100%', background: sailingPct >= 100 ? 'linear-gradient(90deg,#818cf8,#fb923c)' : 'linear-gradient(90deg,#818cf8,#22d3ee)', borderRadius: 6, transition: 'width 0.3s' }} />
-            <div style={{ position: 'absolute', left: `${Math.min(sailingPct, 99)}%`, top: -4, width: 4, height: 20, background: '#f87171', borderRadius: 2, boxShadow: '0 0 8px #f87171' }} />
+          <div style={{ position: 'relative', height: 12, background: 'rgba(8,145,178,0.1)', borderRadius: 6, overflow: 'visible' }}>
+            <div style={{ position: 'absolute', left: 0, width: `${sailingPct}%`, height: '100%', background: sailingPct >= 100 ? 'linear-gradient(90deg,#6366f1,#f97316)' : 'linear-gradient(90deg,#6366f1,#06b6d4)', borderRadius: 6, transition: 'width 0.3s' }} />
+            <div style={{ position: 'absolute', left: `${Math.min(sailingPct, 99)}%`, top: -4, width: 4, height: 20, background: '#dc2626', borderRadius: 2, boxShadow: '0 0 6px rgba(220,38,38,0.5)' }} />
           </div>
         </div>
       )}
 
       {/* Product + ETA */}
-      <div style={{ borderTop: '1px solid rgba(34,211,238,0.08)', paddingTop: 12, marginBottom: 12 }}>
+      <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: 12, marginBottom: 12 }}>
         <DataRow label="Producto" value={item.main_product || '—'} />
         <DataRow label="ETA Puerto" value={formatDate(item.eta_port)} />
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
-          <span style={{ fontSize: 16, color: '#475569', fontFamily: 'monospace', letterSpacing: 1 }}>ESTADO ETA</span>
-          <span style={{ fontSize: 17, color: etaColor, fontFamily: 'monospace', fontWeight: 700 }}>{etaLabel}</span>
+          <span style={{ fontSize: 14, color: '#94a3b8', fontFamily: 'monospace', letterSpacing: 1 }}>ESTADO ETA</span>
+          <span style={{ fontSize: 15, color: etaColor, fontFamily: 'monospace', fontWeight: 700 }}>{etaLabel}</span>
         </div>
         <DataRow label="Delivery posible" value={formatDate(item.possible_delivery_date)} />
       </div>
@@ -387,17 +385,17 @@ function ImportCard({ item, today }: any) {
 
       {/* Próximos pagos */}
       {pendingForCard.length > 0 && (
-        <div style={{ background: 'rgba(251,191,36,0.04)', border: '1px solid rgba(251,191,36,0.12)', borderRadius: 6, padding: '12px 14px', marginBottom: 12 }}>
-          <span style={{ fontSize: 15, color: '#fbbf24', letterSpacing: 3, textTransform: 'uppercase', fontFamily: 'monospace', display: 'block', marginBottom: 10 }}>◈ Próximos pagos</span>
+        <div style={{ background: 'rgba(217,119,6,0.04)', border: '1px solid rgba(217,119,6,0.15)', borderRadius: 6, padding: '12px 14px', marginBottom: 12 }}>
+          <span style={{ fontSize: 13, color: '#d97706', letterSpacing: 3, textTransform: 'uppercase', fontFamily: 'monospace', display: 'block', marginBottom: 10 }}>◈ Próximos pagos</span>
           {pendingForCard.map((p: any) => {
             const isUrgent = Math.ceil((new Date(p.due_date + 'T00:00:00').getTime() - new Date().getTime()) / 86400000) <= 7
             return (
-              <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 8, fontSize: 17, marginBottom: 6, background: isUrgent ? 'rgba(248,113,113,0.06)' : 'transparent', borderRadius: 3, padding: '4px 6px' }}>
-                <span style={{ color: '#94a3b8', fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.concept}</span>
-                <span style={{ color: '#fbbf24', fontFamily: 'monospace', fontWeight: 700, textAlign: 'right' }}>
+              <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 8, fontSize: 15, marginBottom: 6, background: isUrgent ? 'rgba(220,38,38,0.04)' : 'transparent', borderRadius: 3, padding: '4px 6px' }}>
+                <span style={{ color: '#475569', fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.concept}</span>
+                <span style={{ color: '#d97706', fontFamily: 'monospace', fontWeight: 700, textAlign: 'right' }}>
                   {p.currency === 'USD' ? `U$S ${Number(p.amount||0).toLocaleString('es-AR')}` : `$ ${Number(p.amount||0).toLocaleString('es-AR')}`}
                 </span>
-                <span style={{ color: isUrgent ? '#f87171' : '#475569', fontFamily: 'monospace', textAlign: 'right' }}>{formatDate(p.due_date)}</span>
+                <span style={{ color: isUrgent ? '#dc2626' : '#94a3b8', fontFamily: 'monospace', textAlign: 'right' }}>{formatDate(p.due_date)}</span>
               </div>
             )
           })}
@@ -409,8 +407,8 @@ function ImportCard({ item, today }: any) {
         <div style={styles.miniBlock}>
           <span style={styles.miniBlockTitle}>Fabricación</span>
           <DataRow label="Costo" value={money(item.manufacturer_cost, 'USD')} small />
-          <DataRow label="Pagado" value={money(paidTotal, 'USD')} small accent="#4ade80" />
-          <DataRow label="Pendiente" value={money(Number(item.manufacturer_cost||0)-paidTotal, 'USD')} small accent="#f87171" />
+          <DataRow label="Pagado" value={money(paidTotal, 'USD')} small accent="#16a34a" />
+          <DataRow label="Pendiente" value={money(Number(item.manufacturer_cost||0)-paidTotal, 'USD')} small accent="#dc2626" />
         </div>
         <div style={styles.miniBlock}>
           <span style={styles.miniBlockTitle}>ARCA</span>
@@ -422,11 +420,11 @@ function ImportCard({ item, today }: any) {
 
       {/* Notes */}
       {item.notes && (
-        <p style={{ fontSize: 17, color: '#475569', borderTop: '1px solid rgba(34,211,238,0.08)', paddingTop: 10, marginBottom: 12, fontStyle: 'italic' }}>{item.notes}</p>
+        <p style={{ fontSize: 15, color: '#94a3b8', borderTop: '1px solid #f1f5f9', paddingTop: 10, marginBottom: 12, fontStyle: 'italic' }}>{item.notes}</p>
       )}
 
       {/* Actions */}
-      <div style={{ display: 'flex', gap: 10, borderTop: '1px solid rgba(34,211,238,0.08)', paddingTop: 14 }}>
+      <div style={{ display: 'flex', gap: 10, borderTop: '1px solid #f1f5f9', paddingTop: 14 }}>
         <a href={`/imports/${item.id}`} style={styles.actionBtn}>Editar</a>
         <a href={`/imports/${item.id}/documents`} style={styles.actionBtnDocs}>Documentos</a>
         <a href={`/payments?importId=${item.id}`} style={styles.actionBtnPayments}>Pagos</a>
@@ -438,17 +436,17 @@ function ImportCard({ item, today }: any) {
 function DataRow({ label, value, small = false, accent }: any) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
-      <span style={{ fontSize: small ? 15 : 17, color: '#475569', fontFamily: 'monospace', letterSpacing: 0.5 }}>{label}</span>
-      <span style={{ fontSize: small ? 15 : 17, color: accent || '#94a3b8', fontFamily: 'monospace', fontWeight: accent ? 700 : 400 }}>{value}</span>
+      <span style={{ fontSize: small ? 13 : 15, color: '#94a3b8', fontFamily: 'monospace', letterSpacing: 0.5 }}>{label}</span>
+      <span style={{ fontSize: small ? 13 : 15, color: accent || '#475569', fontFamily: 'monospace', fontWeight: accent ? 700 : 400 }}>{value}</span>
     </div>
   )
 }
 
 function MiniStat({ label, value }: any) {
   return (
-    <div style={{ background: 'rgba(34,211,238,0.04)', border: '1px solid rgba(34,211,238,0.1)', borderRadius: 6, padding: '10px 12px', textAlign: 'center' }}>
-      <span style={{ fontSize: 24, fontWeight: 700, fontFamily: 'monospace', color: '#22d3ee', display: 'block' }}>{value}</span>
-      <span style={{ fontSize: 15, color: '#475569', textTransform: 'uppercase', letterSpacing: 2 }}>{label}</span>
+    <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 6, padding: '10px 12px', textAlign: 'center' }}>
+      <span style={{ fontSize: 24, fontWeight: 700, fontFamily: 'monospace', color: '#0891b2', display: 'block' }}>{value}</span>
+      <span style={{ fontSize: 13, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 2, fontFamily: 'monospace' }}>{label}</span>
     </div>
   )
 }
@@ -492,18 +490,18 @@ function MonthlyPaymentsChart({ payments }: { payments: any[] }) {
   const fmtArs = (n: number) => n >= 1000000 ? `$ ${(n/1000000).toFixed(1)}M` : `$ ${n.toLocaleString('es-AR')}`
 
   if (pending.length === 0) {
-    return <div style={{ color: '#475569', fontFamily: 'monospace', fontSize: 13, textAlign: 'center', padding: '40px 0' }}>Sin pagos pendientes</div>
+    return <div style={{ color: '#94a3b8', fontFamily: 'monospace', fontSize: 13, textAlign: 'center', padding: '40px 0' }}>Sin pagos pendientes</div>
   }
 
   return (
     <div style={{ width: '100%' }}>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: 'block' }}>
         {/* current month column highlight */}
-        <rect x={PL} y={USD_TOP} width={STEP} height={TRACK_H * 2 + GAP} fill="rgba(34,211,238,0.03)" rx={2} />
+        <rect x={PL} y={USD_TOP} width={STEP} height={TRACK_H * 2 + GAP} fill="rgba(8,145,178,0.04)" rx={2} />
 
         {/* USD track */}
-        <text x={PL - 4} y={USD_TOP + TRACK_H / 2 + 5} textAnchor="end" fill="#22d3ee" fontSize={14} fontFamily="monospace" opacity={0.7}>USD</text>
-        <line x1={PL} y1={USD_TOP + TRACK_H} x2={W - PR} y2={USD_TOP + TRACK_H} stroke="rgba(34,211,238,0.15)" strokeWidth={1} />
+        <text x={PL - 4} y={USD_TOP + TRACK_H / 2 + 5} textAnchor="end" fill="#0891b2" fontSize={14} fontFamily="monospace" opacity={0.8}>USD</text>
+        <line x1={PL} y1={USD_TOP + TRACK_H} x2={W - PR} y2={USD_TOP + TRACK_H} stroke="#e2e8f0" strokeWidth={1} />
         {months.map((m, i) => {
           const val = usdByMonth[m.key]
           if (!val) return null
@@ -511,10 +509,10 @@ function MonthlyPaymentsChart({ payments }: { payments: any[] }) {
           const x = barX(i)
           const y = USD_TOP + TRACK_H - h
           const isOverdue = m.key < todayKey
-          const color = isOverdue ? '#f87171' : '#22d3ee'
+          const color = isOverdue ? '#ef4444' : '#0891b2'
           return (
             <g key={m.key}>
-              <rect x={x} y={y} width={BAR_W} height={h} fill={`${color}28`} rx={2} />
+              <rect x={x} y={y} width={BAR_W} height={h} fill={`${color}20`} rx={2} />
               <rect x={x} y={y} width={BAR_W} height={2} fill={color} rx={1} />
               <text x={x + BAR_W / 2} y={y - 5} textAnchor="middle" fill={color} fontSize={12} fontFamily="monospace">{fmtUsd(val)}</text>
             </g>
@@ -522,8 +520,8 @@ function MonthlyPaymentsChart({ payments }: { payments: any[] }) {
         })}
 
         {/* ARS track */}
-        <text x={PL - 4} y={ARS_TOP + TRACK_H / 2 + 5} textAnchor="end" fill="#fb923c" fontSize={14} fontFamily="monospace" opacity={0.7}>ARS</text>
-        <line x1={PL} y1={ARS_TOP + TRACK_H} x2={W - PR} y2={ARS_TOP + TRACK_H} stroke="rgba(251,146,60,0.15)" strokeWidth={1} />
+        <text x={PL - 4} y={ARS_TOP + TRACK_H / 2 + 5} textAnchor="end" fill="#f97316" fontSize={14} fontFamily="monospace" opacity={0.8}>ARS</text>
+        <line x1={PL} y1={ARS_TOP + TRACK_H} x2={W - PR} y2={ARS_TOP + TRACK_H} stroke="#e2e8f0" strokeWidth={1} />
         {months.map((m, i) => {
           const val = arsByMonth[m.key]
           if (!val) return null
@@ -531,10 +529,10 @@ function MonthlyPaymentsChart({ payments }: { payments: any[] }) {
           const x = barX(i)
           const y = ARS_TOP + TRACK_H - h
           const isOverdue = m.key < todayKey
-          const color = isOverdue ? '#f87171' : '#fb923c'
+          const color = isOverdue ? '#ef4444' : '#f97316'
           return (
             <g key={m.key}>
-              <rect x={x} y={y} width={BAR_W} height={h} fill={`${color}28`} rx={2} />
+              <rect x={x} y={y} width={BAR_W} height={h} fill={`${color}20`} rx={2} />
               <rect x={x} y={y} width={BAR_W} height={2} fill={color} rx={1} />
               <text x={x + BAR_W / 2} y={y - 5} textAnchor="middle" fill={color} fontSize={12} fontFamily="monospace">{fmtArs(val)}</text>
             </g>
@@ -543,7 +541,7 @@ function MonthlyPaymentsChart({ payments }: { payments: any[] }) {
 
         {/* Month labels */}
         {months.map((m, i) => (
-          <text key={m.key} x={PL + i * STEP + STEP / 2} y={H - 4} textAnchor="middle" fill={m.key === todayKey ? '#22d3ee' : '#334155'} fontSize={14} fontFamily="monospace">{m.label}</text>
+          <text key={m.key} x={PL + i * STEP + STEP / 2} y={H - 4} textAnchor="middle" fill={m.key === todayKey ? '#0891b2' : '#cbd5e1'} fontSize={14} fontFamily="monospace">{m.label}</text>
         ))}
       </svg>
     </div>
@@ -555,97 +553,99 @@ function MonthlyPaymentsChart({ payments }: { payments: any[] }) {
 const styles: Record<string, React.CSSProperties> = {
   page: {
     minHeight: '100vh',
-    background: '#060d1a',
-    backgroundImage: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(34,211,238,0.06) 0%, transparent 60%), linear-gradient(180deg, #060d1a 0%, #0a1628 100%)',
+    background: '#f0f4f8',
     padding: '0 32px 60px',
-    color: '#e2e8f0',
+    color: '#0f172a',
+    fontFamily: 'monospace',
   },
   loadingWrap: {
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     gap: 16, height: '100vh',
   },
   loadingDot: {
-    width: 8, height: 8, borderRadius: '50%', background: '#22d3ee',
+    width: 8, height: 8, borderRadius: '50%', background: '#0891b2',
     animation: 'pulse 1s ease-in-out infinite',
   },
   header: {
     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
     padding: '16px 0 20px',
-    borderBottom: '1px solid rgba(34,211,238,0.1)',
+    borderBottom: '1px solid #e2e8f0',
     marginBottom: 20,
   },
   logoWrap: { display: 'flex', alignItems: 'center', gap: 10 },
-  logoAccent: { color: '#22d3ee', fontSize: 22 },
+  logoAccent: { color: '#0891b2', fontSize: 22 },
   logoText: {
     fontFamily: 'monospace', fontSize: 22, fontWeight: 700,
-    color: '#e2e8f0', letterSpacing: 4,
+    color: '#0f172a', letterSpacing: 4,
   },
   logoBadge: {
-    fontSize: 13, color: '#22d3ee', background: 'rgba(34,211,238,0.1)',
-    border: '1px solid rgba(34,211,238,0.3)', borderRadius: 3,
+    fontSize: 13, color: '#0891b2', background: 'rgba(8,145,178,0.1)',
+    border: '1px solid rgba(8,145,178,0.3)', borderRadius: 3,
     padding: '2px 6px', fontFamily: 'monospace', letterSpacing: 2,
   },
   nav: { display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' },
   btnPrimary: {
-    background: 'rgba(34,211,238,0.1)', color: '#22d3ee',
-    border: '1px solid rgba(34,211,238,0.4)', borderRadius: 6,
+    background: '#0891b2', color: '#ffffff',
+    border: '1px solid #0891b2', borderRadius: 6,
     padding: '9px 20px', fontSize: 15, fontFamily: 'monospace',
     letterSpacing: 1, textDecoration: 'none', cursor: 'pointer',
   },
   btnGhost: {
-    background: 'transparent', color: '#475569',
-    border: '1px solid rgba(71,85,105,0.4)', borderRadius: 6,
+    background: '#ffffff', color: '#475569',
+    border: '1px solid #e2e8f0', borderRadius: 6,
     padding: '9px 18px', fontSize: 15, fontFamily: 'monospace',
     letterSpacing: 1, textDecoration: 'none', cursor: 'pointer',
   },
   kpiStrip: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-    gap: 10, marginBottom: 20,
+    gap: 12, marginBottom: 20,
   },
   kpiCard: {
-    background: 'rgba(15,23,42,0.8)',
-    border: '1px solid rgba(34,211,238,0.12)',
-    borderRadius: 8, padding: '16px 20px',
-    backdropFilter: 'blur(12px)',
+    background: '#ffffff',
+    border: '1px solid #e2e8f0',
+    borderRadius: 10, padding: '16px 20px',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
     display: 'flex', flexDirection: 'column' as const, gap: 2,
   },
   section: { marginBottom: 20 },
   finGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-    gap: 10,
+    gap: 12,
   },
   finCard: {
-    background: 'rgba(15,23,42,0.8)',
-    border: '1px solid rgba(34,211,238,0.1)',
-    borderRadius: 8, padding: '16px 18px',
+    background: '#ffffff',
+    border: '1px solid #e2e8f0',
+    borderRadius: 10, padding: '16px 18px',
     position: 'relative', overflow: 'hidden',
-    backdropFilter: 'blur(8px)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
   },
   upcomingRow: {
     display: 'flex', alignItems: 'center', gap: 32,
-    background: 'rgba(15,23,42,0.6)',
-    border: '1px solid rgba(34,211,238,0.08)',
+    background: '#ffffff',
+    border: '1px solid #e2e8f0',
     borderRadius: 6, padding: '12px 18px',
+    boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
   },
   filterBar: {
     display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap',
   },
   searchWrap: {
     flex: 1, minWidth: 200, display: 'flex', alignItems: 'center',
-    background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(34,211,238,0.1)',
+    background: '#ffffff', border: '1px solid #e2e8f0',
     borderRadius: 6, padding: '0 14px',
+    boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
   },
   searchInput: {
     flex: 1, background: 'transparent', border: 'none', outline: 'none',
-    color: '#94a3b8', fontFamily: 'monospace', fontSize: 16, padding: '12px 0',
-    letterSpacing: 0.5,
+    color: '#0f172a', fontFamily: 'monospace', fontSize: 16, padding: '10px 0',
   },
   select: {
-    background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(34,211,238,0.1)',
-    color: '#94a3b8', fontFamily: 'monospace', fontSize: 16,
-    borderRadius: 6, padding: '12px 16px', outline: 'none', cursor: 'pointer',
+    background: '#ffffff', border: '1px solid #e2e8f0',
+    color: '#475569', fontFamily: 'monospace', fontSize: 15,
+    borderRadius: 6, padding: '10px 14px', outline: 'none', cursor: 'pointer',
+    boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
   },
   cardsGrid: {
     display: 'grid',
@@ -653,38 +653,40 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 16,
   },
   importCard: {
-    background: 'rgba(10,22,40,0.9)',
-    border: '1px solid rgba(34,211,238,0.1)',
-    borderRadius: 10, padding: '22px',
-    backdropFilter: 'blur(16px)',
-    transition: 'border-color 0.2s',
+    background: '#ffffff',
+    border: '1px solid #e2e8f0',
+    borderRadius: 12, padding: '22px',
+    boxShadow: '0 1px 4px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
   },
   miniBlock: {
-    background: 'rgba(34,211,238,0.02)',
-    border: '1px solid rgba(34,211,238,0.07)',
+    background: '#f8fafc',
+    border: '1px solid #e2e8f0',
     borderRadius: 6, padding: '12px 14px',
   },
   miniBlockTitle: {
-    fontSize: 15, color: '#22d3ee', letterSpacing: 3,
+    fontSize: 12, color: '#94a3b8', letterSpacing: 3,
     textTransform: 'uppercase' as const, fontFamily: 'monospace',
-    display: 'block' as const, marginBottom: 10,
+    display: 'block' as const, marginBottom: 8,
   },
   actionBtn: {
-    background: 'rgba(34,211,238,0.1)', color: '#22d3ee',
-    border: '1px solid rgba(34,211,238,0.3)', borderRadius: 5,
-    padding: '8px 16px', fontSize: 17, fontFamily: 'monospace',
-    textDecoration: 'none', letterSpacing: 1,
+    flex: 1, background: 'rgba(8,145,178,0.08)', color: '#0891b2',
+    border: '1px solid rgba(8,145,178,0.3)', borderRadius: 6,
+    padding: '8px 0', fontSize: 14, fontFamily: 'monospace',
+    letterSpacing: 1, textDecoration: 'none', textAlign: 'center' as const,
+    cursor: 'pointer',
   },
   actionBtnDocs: {
-    background: 'rgba(167,139,250,0.1)', color: '#a78bfa',
-    border: '1px solid rgba(167,139,250,0.3)', borderRadius: 5,
-    padding: '8px 16px', fontSize: 17, fontFamily: 'monospace',
-    textDecoration: 'none', letterSpacing: 1,
+    flex: 1, background: 'rgba(124,58,237,0.08)', color: '#7c3aed',
+    border: '1px solid rgba(124,58,237,0.3)', borderRadius: 6,
+    padding: '8px 0', fontSize: 14, fontFamily: 'monospace',
+    letterSpacing: 1, textDecoration: 'none', textAlign: 'center' as const,
+    cursor: 'pointer',
   },
   actionBtnPayments: {
-    background: 'rgba(251,191,36,0.1)', color: '#fbbf24',
-    border: '1px solid rgba(251,191,36,0.3)', borderRadius: 5,
-    padding: '8px 16px', fontSize: 17, fontFamily: 'monospace',
-    textDecoration: 'none', letterSpacing: 1,
+    flex: 1, background: 'rgba(217,119,6,0.08)', color: '#d97706',
+    border: '1px solid rgba(217,119,6,0.3)', borderRadius: 6,
+    padding: '8px 0', fontSize: 14, fontFamily: 'monospace',
+    letterSpacing: 1, textDecoration: 'none', textAlign: 'center' as const,
+    cursor: 'pointer',
   },
 }
