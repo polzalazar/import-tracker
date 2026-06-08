@@ -4,20 +4,20 @@ import { use, useEffect, useState } from 'react'
 import { supabase } from '../../../lib/supabase'
 
 const S = {
-  page: { minHeight: '100vh', background: '#060d1a', backgroundImage: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(34,211,238,0.06) 0%, transparent 60%)', padding: '0 32px 60px', color: '#e2e8f0', fontFamily: 'monospace' } as React.CSSProperties,
-  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0 20px', borderBottom: '1px solid rgba(34,211,238,0.1)', marginBottom: 28 } as React.CSSProperties,
-  title: { fontSize: 22, fontWeight: 700, color: '#e2e8f0', letterSpacing: 2, fontFamily: 'monospace' } as React.CSSProperties,
-  card: { background: 'rgba(10,22,40,0.9)', border: '1px solid rgba(34,211,238,0.1)', borderRadius: 10, padding: '24px 28px', marginBottom: 24 } as React.CSSProperties,
-  label: { display: 'block', fontSize: 12, color: '#475569', textTransform: 'uppercase', letterSpacing: 2, fontFamily: 'monospace', marginBottom: 5, marginTop: 14 } as React.CSSProperties,
-  input: { width: '100%', background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(34,211,238,0.15)', borderRadius: 6, color: '#e2e8f0', fontFamily: 'monospace', fontSize: 16, padding: '10px 14px', outline: 'none', boxSizing: 'border-box' } as React.CSSProperties,
-  select: { width: '100%', background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(34,211,238,0.15)', borderRadius: 6, color: '#e2e8f0', fontFamily: 'monospace', fontSize: 16, padding: '10px 14px', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' } as React.CSSProperties,
-  textarea: { width: '100%', background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(34,211,238,0.15)', borderRadius: 6, color: '#e2e8f0', fontFamily: 'monospace', fontSize: 16, padding: '10px 14px', outline: 'none', minHeight: 80, resize: 'vertical', boxSizing: 'border-box' } as React.CSSProperties,
-  btnPrimary: { background: 'rgba(34,211,238,0.1)', color: '#22d3ee', border: '1px solid rgba(34,211,238,0.4)', borderRadius: 6, padding: '10px 22px', fontSize: 15, fontFamily: 'monospace', letterSpacing: 1, cursor: 'pointer' } as React.CSSProperties,
-  btnGhost: { background: 'transparent', color: '#475569', border: '1px solid rgba(71,85,105,0.4)', borderRadius: 6, padding: '10px 20px', fontSize: 15, fontFamily: 'monospace', letterSpacing: 1, textDecoration: 'none', cursor: 'pointer', display: 'inline-block' } as React.CSSProperties,
-  btnDanger: { background: 'rgba(248,113,113,0.08)', color: '#f87171', border: '1px solid rgba(248,113,113,0.4)', borderRadius: 6, padding: '10px 22px', fontSize: 15, fontFamily: 'monospace', letterSpacing: 1, cursor: 'pointer' } as React.CSSProperties,
+  page: { minHeight: '100vh', background: '#f0f4f8', padding: '0 32px 60px', color: '#0f172a', fontFamily: 'monospace' } as React.CSSProperties,
+  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0 20px', borderBottom: '1px solid #e2e8f0', marginBottom: 28 } as React.CSSProperties,
+  title: { fontSize: 22, fontWeight: 700, color: '#0f172a', letterSpacing: 2, fontFamily: 'monospace' } as React.CSSProperties,
+  card: { background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 10, padding: '24px 28px', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' } as React.CSSProperties,
+  label: { display: 'block', fontSize: 12, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 2, fontFamily: 'monospace', marginBottom: 5, marginTop: 14 } as React.CSSProperties,
+  input: { width: '100%', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 6, color: '#0f172a', fontFamily: 'monospace', fontSize: 16, padding: '10px 14px', outline: 'none', boxSizing: 'border-box' } as React.CSSProperties,
+  select: { width: '100%', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 6, color: '#0f172a', fontFamily: 'monospace', fontSize: 16, padding: '10px 14px', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' } as React.CSSProperties,
+  textarea: { width: '100%', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 6, color: '#0f172a', fontFamily: 'monospace', fontSize: 16, padding: '10px 14px', outline: 'none', minHeight: 80, resize: 'vertical', boxSizing: 'border-box' } as React.CSSProperties,
+  btnPrimary: { background: '#0891b2', color: '#ffffff', border: '1px solid #0891b2', borderRadius: 6, padding: '10px 22px', fontSize: 15, fontFamily: 'monospace', letterSpacing: 1, cursor: 'pointer' } as React.CSSProperties,
+  btnGhost: { background: '#ffffff', color: '#475569', border: '1px solid #e2e8f0', borderRadius: 6, padding: '10px 20px', fontSize: 15, fontFamily: 'monospace', letterSpacing: 1, textDecoration: 'none', cursor: 'pointer', display: 'inline-block' } as React.CSSProperties,
+  btnDanger: { background: 'rgba(220,38,38,0.06)', color: '#dc2626', border: '1px solid rgba(220,38,38,0.3)', borderRadius: 6, padding: '10px 22px', fontSize: 15, fontFamily: 'monospace', letterSpacing: 1, cursor: 'pointer' } as React.CSSProperties,
   sectionTitle: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, marginTop: 28 } as React.CSSProperties,
-  groupTitle: { fontSize: 12, color: '#22d3ee', letterSpacing: 4, textTransform: 'uppercase', fontFamily: 'monospace' } as React.CSSProperties,
-  divider: { flex: 1, height: 1, background: 'linear-gradient(90deg, rgba(34,211,238,0.3), transparent)' } as React.CSSProperties,
+  groupTitle: { fontSize: 12, color: '#0891b2', letterSpacing: 4, textTransform: 'uppercase', fontFamily: 'monospace' } as React.CSSProperties,
+  divider: { flex: 1, height: 1, background: 'linear-gradient(90deg, rgba(8,145,178,0.3), transparent)' } as React.CSSProperties,
 }
 
 export default function EditImportPage({ params }: { params: Promise<{ id: string }> }) {
@@ -69,7 +69,6 @@ export default function EditImportPage({ params }: { params: Promise<{ id: strin
     if (!confirm('¿Eliminar esta importación?')) return
     const { error } = await supabase.from('imports').delete().eq('id', id)
     if (error) { alert(error.message); return }
-    alert('Importación eliminada')
     window.location.href = '/'
   }
 
@@ -83,22 +82,16 @@ export default function EditImportPage({ params }: { params: Promise<{ id: strin
       arca_estimated: arcaEstimated || null, arca_status: arcaStatus, arca_payment_date: arcaPaymentDate || null,
     }).eq('id', id)
     if (error) { alert('Error: ' + error.message); return }
-    alert('Importación actualizada')
     window.location.href = '/'
   }
 
   return (
     <main style={S.page}>
-      <style>{`
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        option { background: #0f172a; color: #94a3b8; }
-        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.5); }
-        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: #0f172a; } ::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 2px; }
-      `}</style>
+      <style>{`* { box-sizing: border-box; margin: 0; padding: 0; } option { background: #ffffff; color: #0f172a; } input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; } ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: #f1f5f9; } ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; } textarea::placeholder { color: #94a3b8; }`}</style>
 
       <header style={S.header}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ color: '#22d3ee', fontSize: 20 }}>▸</span>
+          <span style={{ color: '#0891b2', fontSize: 20 }}>▸</span>
           <span style={S.title}>EDITAR IMPORTACIÓN</span>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
@@ -114,34 +107,36 @@ export default function EditImportPage({ params }: { params: Promise<{ id: strin
               <span style={S.groupTitle}>◈ General</span>
               <div style={S.divider} />
             </div>
-
             <label style={S.label}>Código</label>
             <input style={S.input} value={code} onChange={e => setCode(e.target.value)} />
-
             <label style={S.label}>Producto principal</label>
             <input style={S.input} value={mainProduct} onChange={e => setMainProduct(e.target.value)} />
-
-            <label style={S.label}>Estado</label>
-            <select style={S.select} value={status} onChange={e => setStatus(e.target.value)}>
-              <option>Pedido confirmado</option>
-              <option>En fabricación</option>
-              <option>Listo para embarcar</option>
-              <option>Embarcado</option>
-              <option>En tránsito</option>
-              <option>Arribado</option>
-              <option>En aduana</option>
-              <option>Nacionalizado</option>
-              <option>En depósito</option>
-              <option>Disponible</option>
-              <option>Cerrado</option>
-            </select>
-
-            <label style={S.label}>Riesgo</label>
-            <select style={S.select} value={risk} onChange={e => setRisk(e.target.value)}>
-              <option>Bajo</option>
-              <option>Medio</option>
-              <option>Alto</option>
-            </select>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div>
+                <label style={S.label}>Estado</label>
+                <select style={S.select} value={status} onChange={e => setStatus(e.target.value)}>
+                  <option>Pedido confirmado</option>
+                  <option>En fabricación</option>
+                  <option>Listo para embarcar</option>
+                  <option>Embarcado</option>
+                  <option>En tránsito</option>
+                  <option>Arribado</option>
+                  <option>En aduana</option>
+                  <option>Nacionalizado</option>
+                  <option>En depósito</option>
+                  <option>Disponible</option>
+                  <option>Cerrado</option>
+                </select>
+              </div>
+              <div>
+                <label style={S.label}>Riesgo</label>
+                <select style={S.select} value={risk} onChange={e => setRisk(e.target.value)}>
+                  <option>Bajo</option>
+                  <option>Medio</option>
+                  <option>Alto</option>
+                </select>
+              </div>
+            </div>
           </div>
 
           <div style={S.card}>
@@ -149,11 +144,14 @@ export default function EditImportPage({ params }: { params: Promise<{ id: strin
               <span style={S.groupTitle}>◈ Fechas</span>
               <div style={S.divider} />
             </div>
-
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div>
                 <label style={S.label}>Pago orden de compra</label>
                 <input type="date" style={S.input} value={orderDate} onChange={e => setOrderDate(e.target.value)} />
+              </div>
+              <div>
+                <label style={S.label}>Delivery posible</label>
+                <input type="date" style={S.input} value={possibleDeliveryDate} onChange={e => setPossibleDeliveryDate(e.target.value)} />
               </div>
               <div>
                 <label style={S.label}>Fecha de zarpe</label>
@@ -162,10 +160,6 @@ export default function EditImportPage({ params }: { params: Promise<{ id: strin
               <div>
                 <label style={S.label}>ETA Puerto</label>
                 <input type="date" style={S.input} value={etaPort} onChange={e => setEtaPort(e.target.value)} />
-              </div>
-              <div>
-                <label style={S.label}>Delivery posible</label>
-                <input type="date" style={S.input} value={possibleDeliveryDate} onChange={e => setPossibleDeliveryDate(e.target.value)} />
               </div>
             </div>
           </div>
@@ -230,13 +224,13 @@ export default function EditImportPage({ params }: { params: Promise<{ id: strin
           {payments.map(p => (
             <div key={p.id} style={{ ...S.card, marginBottom: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <span style={{ fontSize: 16, fontWeight: 700, color: '#e2e8f0', fontFamily: 'monospace' }}>{p.concept}</span>
-                <div style={{ fontSize: 14, color: '#94a3b8', marginTop: 4, fontFamily: 'monospace' }}>
+                <span style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', fontFamily: 'monospace' }}>{p.concept}</span>
+                <div style={{ fontSize: 13, color: '#94a3b8', marginTop: 4, fontFamily: 'monospace' }}>
                   {p.currency} {Number(p.amount || 0).toLocaleString('es-AR')} · Vence: {p.due_date || '—'}
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ fontSize: 13, color: p.status === 'Pagado' ? '#4ade80' : '#fbbf24', background: p.status === 'Pagado' ? 'rgba(74,222,128,0.1)' : 'rgba(251,191,36,0.1)', border: `1px solid ${p.status === 'Pagado' ? 'rgba(74,222,128,0.3)' : 'rgba(251,191,36,0.3)'}`, borderRadius: 4, padding: '3px 10px', fontFamily: 'monospace' }}>{p.status}</span>
+                <span style={{ fontSize: 12, color: p.status === 'Pagado' ? '#16a34a' : '#d97706', background: p.status === 'Pagado' ? 'rgba(22,163,74,0.1)' : 'rgba(217,119,6,0.1)', border: `1px solid ${p.status === 'Pagado' ? 'rgba(22,163,74,0.3)' : 'rgba(217,119,6,0.3)'}`, borderRadius: 4, padding: '3px 10px', fontFamily: 'monospace' }}>{p.status}</span>
                 <a href={`/payments/${p.id}`} style={{ ...S.btnGhost, padding: '6px 14px', fontSize: 13 }}>Editar</a>
               </div>
             </div>
@@ -249,19 +243,19 @@ export default function EditImportPage({ params }: { params: Promise<{ id: strin
           <div style={S.divider} />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {documents.length === 0 && <p style={{ color: '#475569', fontFamily: 'monospace', fontSize: 14 }}>No hay documentos cargados.</p>}
+          {documents.length === 0 && <p style={{ color: '#94a3b8', fontFamily: 'monospace', fontSize: 14 }}>No hay documentos cargados.</p>}
           {documents.map(doc => (
             <div key={doc.id} style={{ ...S.card, marginBottom: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <span style={{ fontSize: 16, fontWeight: 700, color: '#e2e8f0', fontFamily: 'monospace' }}>{doc.document_type}</span>
-                <div style={{ fontSize: 14, color: '#94a3b8', marginTop: 4, fontFamily: 'monospace' }}>{doc.file_name}</div>
+                <span style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', fontFamily: 'monospace' }}>{doc.document_type}</span>
+                <div style={{ fontSize: 13, color: '#94a3b8', marginTop: 4, fontFamily: 'monospace' }}>{doc.file_name}</div>
               </div>
               <a href={doc.file_url} target="_blank" style={{ ...S.btnGhost, padding: '6px 14px', fontSize: 13 }}>Ver archivo</a>
             </div>
           ))}
         </div>
         <div style={{ marginTop: 14 }}>
-          <a href="/documents" style={S.btnGhost}>+ Subir documento</a>
+          <a href="/documents" style={{ ...S.btnGhost, color: '#7c3aed', borderColor: 'rgba(124,58,237,0.3)', background: 'rgba(124,58,237,0.05)' }}>+ Subir documento</a>
         </div>
       </div>
     </main>

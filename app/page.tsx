@@ -155,7 +155,7 @@ export default function Home() {
       <section style={styles.section}>
         <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start', flexWrap: 'wrap' }}>
           {upcomingPayments.length > 0 && (
-            <div style={{ flex: '1 1 auto', minWidth: 0, overflow: 'auto' }}>
+            <div style={{ flex: '0 0 auto' }}>
               <SectionTitle>Próximos vencimientos</SectionTitle>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {upcomingPayments.map((payment: any) => {

@@ -4,31 +4,31 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 
 const S = {
-  page: { minHeight: '100vh', background: '#060d1a', backgroundImage: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(34,211,238,0.06) 0%, transparent 60%)', padding: '0 32px 60px', color: '#e2e8f0', fontFamily: 'monospace' } as React.CSSProperties,
-  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0 20px', borderBottom: '1px solid rgba(34,211,238,0.1)', marginBottom: 28 } as React.CSSProperties,
-  title: { fontSize: 22, fontWeight: 700, color: '#e2e8f0', letterSpacing: 2, fontFamily: 'monospace' } as React.CSSProperties,
-  card: { background: 'rgba(10,22,40,0.9)', border: '1px solid rgba(34,211,238,0.1)', borderRadius: 10, padding: '24px 28px', marginBottom: 16 } as React.CSSProperties,
-  label: { display: 'block', fontSize: 12, color: '#475569', textTransform: 'uppercase', letterSpacing: 2, fontFamily: 'monospace', marginBottom: 5, marginTop: 14 } as React.CSSProperties,
-  input: { width: '100%', background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(34,211,238,0.15)', borderRadius: 6, color: '#e2e8f0', fontFamily: 'monospace', fontSize: 16, padding: '10px 14px', outline: 'none', boxSizing: 'border-box' } as React.CSSProperties,
-  select: { width: '100%', background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(34,211,238,0.15)', borderRadius: 6, color: '#e2e8f0', fontFamily: 'monospace', fontSize: 16, padding: '10px 14px', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' } as React.CSSProperties,
-  btnPrimary: { background: 'rgba(34,211,238,0.1)', color: '#22d3ee', border: '1px solid rgba(34,211,238,0.4)', borderRadius: 6, padding: '10px 22px', fontSize: 15, fontFamily: 'monospace', letterSpacing: 1, cursor: 'pointer' } as React.CSSProperties,
-  btnGhost: { background: 'transparent', color: '#475569', border: '1px solid rgba(71,85,105,0.4)', borderRadius: 6, padding: '10px 20px', fontSize: 15, fontFamily: 'monospace', letterSpacing: 1, textDecoration: 'none', cursor: 'pointer', display: 'inline-block' } as React.CSSProperties,
+  page: { minHeight: '100vh', background: '#f0f4f8', padding: '0 32px 60px', color: '#0f172a', fontFamily: 'monospace' } as React.CSSProperties,
+  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0 20px', borderBottom: '1px solid #e2e8f0', marginBottom: 28 } as React.CSSProperties,
+  title: { fontSize: 22, fontWeight: 700, color: '#0f172a', letterSpacing: 2, fontFamily: 'monospace' } as React.CSSProperties,
+  card: { background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 10, padding: '24px 28px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' } as React.CSSProperties,
+  label: { display: 'block', fontSize: 12, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 2, fontFamily: 'monospace', marginBottom: 5, marginTop: 14 } as React.CSSProperties,
+  input: { width: '100%', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 6, color: '#0f172a', fontFamily: 'monospace', fontSize: 16, padding: '10px 14px', outline: 'none', boxSizing: 'border-box' } as React.CSSProperties,
+  select: { width: '100%', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 6, color: '#0f172a', fontFamily: 'monospace', fontSize: 16, padding: '10px 14px', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' } as React.CSSProperties,
+  btnPrimary: { background: '#0891b2', color: '#ffffff', border: '1px solid #0891b2', borderRadius: 6, padding: '10px 22px', fontSize: 15, fontFamily: 'monospace', letterSpacing: 1, cursor: 'pointer' } as React.CSSProperties,
+  btnGhost: { background: '#ffffff', color: '#475569', border: '1px solid #e2e8f0', borderRadius: 6, padding: '10px 20px', fontSize: 15, fontFamily: 'monospace', letterSpacing: 1, textDecoration: 'none', cursor: 'pointer', display: 'inline-block' } as React.CSSProperties,
   sectionTitle: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 } as React.CSSProperties,
-  groupTitle: { fontSize: 12, color: '#22d3ee', letterSpacing: 4, textTransform: 'uppercase', fontFamily: 'monospace' } as React.CSSProperties,
-  divider: { flex: 1, height: 1, background: 'linear-gradient(90deg, rgba(34,211,238,0.3), transparent)' } as React.CSSProperties,
+  groupTitle: { fontSize: 12, color: '#0891b2', letterSpacing: 4, textTransform: 'uppercase', fontFamily: 'monospace' } as React.CSSProperties,
+  divider: { flex: 1, height: 1, background: 'linear-gradient(90deg, rgba(8,145,178,0.3), transparent)' } as React.CSSProperties,
 }
 
 function conceptColor(concept: string) {
   const map: Record<string, { color: string; bg: string }> = {
-    'ANTICIPO FABRICANTE': { color: '#4ade80', bg: 'rgba(74,222,128,0.1)' },
-    'SALDO FABRICANTE':    { color: '#a78bfa', bg: 'rgba(167,139,250,0.1)' },
-    'FLETE MARÍTIMO':      { color: '#38bdf8', bg: 'rgba(56,189,248,0.1)' },
-    'ARCA':                { color: '#fb923c', bg: 'rgba(251,146,60,0.1)' },
-    'TERMINAL PORTUARIA':  { color: '#94a3b8', bg: 'rgba(148,163,184,0.1)' },
-    'DESPACHANTE':         { color: '#fbbf24', bg: 'rgba(251,191,36,0.1)' },
-    'CAMIÓN':              { color: '#fbbf24', bg: 'rgba(251,191,36,0.1)' },
+    'ANTICIPO FABRICANTE': { color: '#16a34a', bg: 'rgba(22,163,74,0.1)' },
+    'SALDO FABRICANTE':    { color: '#7c3aed', bg: 'rgba(124,58,237,0.1)' },
+    'FLETE MARÍTIMO':      { color: '#0891b2', bg: 'rgba(8,145,178,0.1)' },
+    'ARCA':                { color: '#f97316', bg: 'rgba(249,115,22,0.1)' },
+    'TERMINAL PORTUARIA':  { color: '#64748b', bg: 'rgba(100,116,139,0.1)' },
+    'DESPACHANTE':         { color: '#d97706', bg: 'rgba(217,119,6,0.1)' },
+    'CAMIÓN':              { color: '#d97706', bg: 'rgba(217,119,6,0.1)' },
   }
-  return map[concept] || { color: '#94a3b8', bg: 'rgba(148,163,184,0.1)' }
+  return map[concept] || { color: '#64748b', bg: 'rgba(100,116,139,0.1)' }
 }
 
 export default function PaymentsPage() {
@@ -67,17 +67,16 @@ export default function PaymentsPage() {
 
   return (
     <main style={S.page}>
-      <style>{`* { box-sizing: border-box; margin: 0; padding: 0; } option { background: #0f172a; color: #94a3b8; } input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.5); } ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: #0f172a; } ::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 2px; }`}</style>
+      <style>{`* { box-sizing: border-box; margin: 0; padding: 0; } option { background: #ffffff; color: #0f172a; } input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; } ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: #f1f5f9; } ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }`}</style>
 
       <header style={S.header}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ color: '#22d3ee', fontSize: 20 }}>▸</span>
+          <span style={{ color: '#d97706', fontSize: 20 }}>▸</span>
           <span style={S.title}>PAGOS</span>
         </div>
         <a href="/" style={S.btnGhost}>← Volver</a>
       </header>
 
-      {/* Nuevo pago */}
       <div style={{ maxWidth: 780 }}>
         <div style={S.card}>
           <div style={S.sectionTitle}>
@@ -140,7 +139,6 @@ export default function PaymentsPage() {
           </form>
         </div>
 
-        {/* Lista */}
         <div style={S.sectionTitle}>
           <span style={S.groupTitle}>◈ Historial</span>
           <div style={S.divider} />
@@ -153,16 +151,16 @@ export default function PaymentsPage() {
               <div key={p.id} style={{ ...S.card, marginBottom: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-                    <span style={{ fontSize: 13, color: cc.color, background: cc.bg, border: `1px solid ${cc.color}40`, borderRadius: 4, padding: '2px 10px', letterSpacing: 1 }}>{p.concept}</span>
-                    <span style={{ fontSize: 13, color: '#475569', fontFamily: 'monospace' }}>{p.imports?.code}</span>
+                    <span style={{ fontSize: 12, color: cc.color, background: cc.bg, border: `1px solid ${cc.color}40`, borderRadius: 4, padding: '2px 10px', letterSpacing: 1, fontFamily: 'monospace' }}>{p.concept}</span>
+                    <span style={{ fontSize: 13, color: '#94a3b8', fontFamily: 'monospace' }}>{p.imports?.code}</span>
                   </div>
                   <div style={{ display: 'flex', gap: 20, fontSize: 15, color: '#94a3b8' }}>
-                    <span style={{ color: '#e2e8f0', fontWeight: 700 }}>{p.currency === 'USD' ? `U$S ${Number(p.amount||0).toLocaleString('es-AR')}` : `$ ${Number(p.amount||0).toLocaleString('es-AR')}`}</span>
-                    <span>Vence: {p.due_date || '—'}</span>
+                    <span style={{ color: '#0f172a', fontWeight: 700, fontFamily: 'monospace' }}>{p.currency === 'USD' ? `U$S ${Number(p.amount||0).toLocaleString('es-AR')}` : `$ ${Number(p.amount||0).toLocaleString('es-AR')}`}</span>
+                    <span style={{ fontFamily: 'monospace' }}>Vence: {p.due_date || '—'}</span>
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <span style={{ fontSize: 13, color: isPaid ? '#4ade80' : '#fbbf24', background: isPaid ? 'rgba(74,222,128,0.1)' : 'rgba(251,191,36,0.1)', border: `1px solid ${isPaid ? 'rgba(74,222,128,0.3)' : 'rgba(251,191,36,0.3)'}`, borderRadius: 4, padding: '3px 10px' }}>{p.status}</span>
+                  <span style={{ fontSize: 12, color: isPaid ? '#16a34a' : '#d97706', background: isPaid ? 'rgba(22,163,74,0.1)' : 'rgba(217,119,6,0.1)', border: `1px solid ${isPaid ? 'rgba(22,163,74,0.3)' : 'rgba(217,119,6,0.3)'}`, borderRadius: 4, padding: '3px 10px', fontFamily: 'monospace' }}>{p.status}</span>
                   <a href={`/payments/${p.id}`} style={{ ...S.btnGhost, padding: '6px 14px', fontSize: 13 }}>Editar</a>
                 </div>
               </div>
