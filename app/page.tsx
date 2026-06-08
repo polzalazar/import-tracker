@@ -175,7 +175,7 @@ export default function Home() {
               </div>
             </div>
           )}
-          <div style={{ flex: '0 0 460px', background: 'rgba(15,23,42,0.6)', border: '1px solid rgba(34,211,238,0.08)', borderRadius: 8, padding: '14px 18px' }}>
+          <div style={{ flex: '0 0 650px', background: 'rgba(15,23,42,0.6)', border: '1px solid rgba(34,211,238,0.08)', borderRadius: 8, padding: '14px 18px' }}>
             <SectionTitle>Pagos pendientes / mes</SectionTitle>
             <MonthlyPaymentsChart payments={payments} />
           </div>
@@ -455,94 +455,96 @@ function MiniStat({ label, value }: any) {
 
 function MonthlyPaymentsChart({ payments }: { payments: any[] }) {
   const today = new Date()
-  const todayStr = today.toISOString().split('T')[0]
-
-  const pending = payments
-    .filter(p => p.status !== 'Pagado' && p.due_date)
-    .sort((a, b) => a.due_date.localeCompare(b.due_date))
-
   const MONTH_NAMES = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC']
+
+  const pending = payments.filter(p => p.status !== 'Pagado' && p.due_date)
+
+  const months = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date(today.getFullYear(), today.getMonth() + i, 1)
+    return { label: MONTH_NAMES[d.getMonth()], key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}` }
+  })
+
+  const usdByMonth: Record<string, number> = {}
+  const arsByMonth: Record<string, number> = {}
+  months.forEach(m => { usdByMonth[m.key] = 0; arsByMonth[m.key] = 0 })
+  pending.forEach(p => {
+    const key = p.due_date.slice(0, 7)
+    if (key in usdByMonth) {
+      if (p.currency === 'USD') usdByMonth[key] += Number(p.amount || 0)
+      else arsByMonth[key] += Number(p.amount || 0)
+    }
+  })
+
+  const maxUsd = Math.max(...Object.values(usdByMonth), 1)
+  const maxArs = Math.max(...Object.values(arsByMonth), 1)
+
+  const W = 420, PL = 46, PR = 8, PT = 16, PB = 24
+  const TRACK_H = 88, GAP = 18
+  const USD_TOP = PT, ARS_TOP = PT + TRACK_H + GAP
+  const H = ARS_TOP + TRACK_H + PB
+  const STEP = (W - PL - PR) / 6
+  const BAR_W = Math.floor(STEP * 0.52)
+  const todayKey = months[0].key
+
+  const barX = (i: number) => PL + i * STEP + (STEP - BAR_W) / 2
+
+  const fmtUsd = (n: number) => n >= 1000000 ? `U$S ${(n/1000000).toFixed(1)}M` : `U$S ${n.toLocaleString('es-AR')}`
+  const fmtArs = (n: number) => n >= 1000000 ? `$ ${(n/1000000).toFixed(1)}M` : `$ ${n.toLocaleString('es-AR')}`
 
   if (pending.length === 0) {
     return <div style={{ color: '#475569', fontFamily: 'monospace', fontSize: 13, textAlign: 'center', padding: '40px 0' }}>Sin pagos pendientes</div>
   }
 
-  // X axis: today → 6 months out
-  const start = new Date(today.getFullYear(), today.getMonth(), 1)
-  const end = new Date(today.getFullYear(), today.getMonth() + 6, 0)
-  const spanDays = (end.getTime() - start.getTime()) / 86400000
-
-  const W = 420, PL = 40, PR = 12, PT = 62, PB = 36
-  const chartW = W - PL - PR
-  const USD_Y = PT + 44, ARS_Y = PT + 130
-  const H = ARS_Y + 52 + PB
-
-  const dateX = (d: string) => {
-    const days = (new Date(d + 'T00:00:00').getTime() - start.getTime()) / 86400000
-    return PL + Math.max(0, Math.min(1, days / spanDays)) * chartW
-  }
-  const todayX = dateX(todayStr)
-
-  // Month tick positions
-  const ticks: { x: number; label: string }[] = []
-  for (let i = 0; i <= 6; i++) {
-    const d = new Date(today.getFullYear(), today.getMonth() + i, 1)
-    if (d <= end) ticks.push({ x: dateX(d.toISOString().split('T')[0]), label: MONTH_NAMES[d.getMonth()] })
-  }
-
-  const fmtUsd = (n: number) => `U$S ${Number(n).toLocaleString('es-AR')}`
-  const fmtArs = (n: number) => `$ ${Number(n).toLocaleString('es-AR')}`
-
-  // Stagger labels vertically to avoid overlap (alternate -18 / -30)
-  const labelOffset = (_arr: any[], idx: number) => idx % 2 === 0 ? -18 : -38
-
-  const usdPayments = pending.filter(p => p.currency === 'USD')
-  const arsPayments = pending.filter(p => p.currency !== 'USD')
-
   return (
     <div style={{ width: '100%' }}>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: 'block' }}>
-        {/* Month gridlines */}
-        {ticks.map(({ x, label }, i) => (
-          <g key={i}>
-            <line x1={x} y1={PT} x2={x} y2={ARS_Y + 14} stroke="rgba(71,85,105,0.25)" strokeWidth={1} strokeDasharray="2,4" />
-            <text x={x} y={H - 4} textAnchor="middle" fill="#334155" fontSize={18} fontFamily="monospace">{label}</text>
-          </g>
-        ))}
-
-        {/* Today marker */}
-        <line x1={todayX} y1={PT} x2={todayX} y2={ARS_Y + 14} stroke="rgba(248,113,113,0.45)" strokeWidth={1.5} />
-        <text x={todayX} y={PT - 5} textAnchor="middle" fill="#f87171" fontSize={16} fontFamily="monospace">HOY</text>
+        {/* current month column highlight */}
+        <rect x={PL} y={USD_TOP} width={STEP} height={TRACK_H * 2 + GAP} fill="rgba(34,211,238,0.03)" rx={2} />
 
         {/* USD track */}
-        <text x={PL - 4} y={USD_Y + 6} textAnchor="end" fill="#22d3ee" fontSize={18} fontFamily="monospace" opacity={0.7}>USD</text>
-        <line x1={PL} y1={USD_Y} x2={W - PR} y2={USD_Y} stroke="rgba(34,211,238,0.18)" strokeWidth={1.5} />
-        {usdPayments.map((p, i) => {
-          const x = dateX(p.due_date)
-          const isOverdue = p.due_date < todayStr
+        <text x={PL - 4} y={USD_TOP + TRACK_H / 2 + 5} textAnchor="end" fill="#22d3ee" fontSize={14} fontFamily="monospace" opacity={0.7}>USD</text>
+        <line x1={PL} y1={USD_TOP + TRACK_H} x2={W - PR} y2={USD_TOP + TRACK_H} stroke="rgba(34,211,238,0.15)" strokeWidth={1} />
+        {months.map((m, i) => {
+          const val = usdByMonth[m.key]
+          if (!val) return null
+          const h = Math.max(5, (val / maxUsd) * TRACK_H * 0.82)
+          const x = barX(i)
+          const y = USD_TOP + TRACK_H - h
+          const isOverdue = m.key < todayKey
           const color = isOverdue ? '#f87171' : '#22d3ee'
           return (
-            <g key={p.id}>
-              <circle cx={x} cy={USD_Y} r={8} fill={color} opacity={0.9} />
-              <text x={x} y={USD_Y + labelOffset(usdPayments, i)} textAnchor="middle" fill={color} fontSize={17} fontFamily="monospace">{fmtUsd(p.amount)}</text>
+            <g key={m.key}>
+              <rect x={x} y={y} width={BAR_W} height={h} fill={`${color}28`} rx={2} />
+              <rect x={x} y={y} width={BAR_W} height={2} fill={color} rx={1} />
+              <text x={x + BAR_W / 2} y={y - 5} textAnchor="middle" fill={color} fontSize={12} fontFamily="monospace">{fmtUsd(val)}</text>
             </g>
           )
         })}
 
         {/* ARS track */}
-        <text x={PL - 4} y={ARS_Y + 6} textAnchor="end" fill="#fb923c" fontSize={18} fontFamily="monospace" opacity={0.7}>ARS</text>
-        <line x1={PL} y1={ARS_Y} x2={W - PR} y2={ARS_Y} stroke="rgba(251,146,60,0.18)" strokeWidth={1.5} />
-        {arsPayments.map((p, i) => {
-          const x = dateX(p.due_date)
-          const isOverdue = p.due_date < todayStr
+        <text x={PL - 4} y={ARS_TOP + TRACK_H / 2 + 5} textAnchor="end" fill="#fb923c" fontSize={14} fontFamily="monospace" opacity={0.7}>ARS</text>
+        <line x1={PL} y1={ARS_TOP + TRACK_H} x2={W - PR} y2={ARS_TOP + TRACK_H} stroke="rgba(251,146,60,0.15)" strokeWidth={1} />
+        {months.map((m, i) => {
+          const val = arsByMonth[m.key]
+          if (!val) return null
+          const h = Math.max(5, (val / maxArs) * TRACK_H * 0.82)
+          const x = barX(i)
+          const y = ARS_TOP + TRACK_H - h
+          const isOverdue = m.key < todayKey
           const color = isOverdue ? '#f87171' : '#fb923c'
           return (
-            <g key={p.id}>
-              <circle cx={x} cy={ARS_Y} r={8} fill={color} opacity={0.9} />
-              <text x={x} y={ARS_Y + labelOffset(arsPayments, i)} textAnchor="middle" fill={color} fontSize={17} fontFamily="monospace">{fmtArs(p.amount)}</text>
+            <g key={m.key}>
+              <rect x={x} y={y} width={BAR_W} height={h} fill={`${color}28`} rx={2} />
+              <rect x={x} y={y} width={BAR_W} height={2} fill={color} rx={1} />
+              <text x={x + BAR_W / 2} y={y - 5} textAnchor="middle" fill={color} fontSize={12} fontFamily="monospace">{fmtArs(val)}</text>
             </g>
           )
         })}
+
+        {/* Month labels */}
+        {months.map((m, i) => (
+          <text key={m.key} x={PL + i * STEP + STEP / 2} y={H - 4} textAnchor="middle" fill={m.key === todayKey ? '#22d3ee' : '#334155'} fontSize={14} fontFamily="monospace">{m.label}</text>
+        ))}
       </svg>
     </div>
   )
