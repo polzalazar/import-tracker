@@ -153,9 +153,9 @@ export default function Home() {
 
       {/* UPCOMING PAYMENTS + MONTHLY CHART */}
       <section style={styles.section}>
-        <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start', flexWrap: 'wrap' }}>
           {upcomingPayments.length > 0 && (
-            <div style={{ flex: '0 0 auto' }}>
+            <div style={{ flex: '1 1 auto', minWidth: 0, overflow: 'auto' }}>
               <SectionTitle>Próximos vencimientos</SectionTitle>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {upcomingPayments.map((payment: any) => {
@@ -175,7 +175,7 @@ export default function Home() {
               </div>
             </div>
           )}
-          <div style={{ flex: '0 0 650px', background: 'rgba(15,23,42,0.6)', border: '1px solid rgba(34,211,238,0.08)', borderRadius: 8, padding: '14px 18px' }}>
+          <div style={{ flex: '0 0 420px', minWidth: 300, background: 'rgba(15,23,42,0.6)', border: '1px solid rgba(34,211,238,0.08)', borderRadius: 8, padding: '14px 18px' }}>
             <SectionTitle>Pagos pendientes / mes</SectionTitle>
             <MonthlyPaymentsChart payments={payments} />
           </div>
