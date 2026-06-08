@@ -3,6 +3,22 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 
+const S = {
+  page: { minHeight: '100vh', background: '#060d1a', backgroundImage: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(34,211,238,0.06) 0%, transparent 60%)', padding: '0 32px 60px', color: '#e2e8f0', fontFamily: 'monospace' } as React.CSSProperties,
+  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0 20px', borderBottom: '1px solid rgba(34,211,238,0.1)', marginBottom: 28 } as React.CSSProperties,
+  title: { fontSize: 22, fontWeight: 700, color: '#e2e8f0', letterSpacing: 2, fontFamily: 'monospace' } as React.CSSProperties,
+  card: { background: 'rgba(10,22,40,0.9)', border: '1px solid rgba(34,211,238,0.1)', borderRadius: 10, padding: '24px 28px', marginBottom: 20 } as React.CSSProperties,
+  label: { display: 'block', fontSize: 12, color: '#475569', textTransform: 'uppercase', letterSpacing: 2, fontFamily: 'monospace', marginBottom: 5, marginTop: 14 } as React.CSSProperties,
+  input: { width: '100%', background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(34,211,238,0.15)', borderRadius: 6, color: '#e2e8f0', fontFamily: 'monospace', fontSize: 16, padding: '10px 14px', outline: 'none', boxSizing: 'border-box' } as React.CSSProperties,
+  select: { width: '100%', background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(34,211,238,0.15)', borderRadius: 6, color: '#e2e8f0', fontFamily: 'monospace', fontSize: 16, padding: '10px 14px', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' } as React.CSSProperties,
+  textarea: { width: '100%', background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(34,211,238,0.15)', borderRadius: 6, color: '#e2e8f0', fontFamily: 'monospace', fontSize: 16, padding: '10px 14px', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 90 } as React.CSSProperties,
+  btnPrimary: { background: 'rgba(34,211,238,0.1)', color: '#22d3ee', border: '1px solid rgba(34,211,238,0.4)', borderRadius: 6, padding: '10px 22px', fontSize: 15, fontFamily: 'monospace', letterSpacing: 1, cursor: 'pointer' } as React.CSSProperties,
+  btnGhost: { background: 'transparent', color: '#475569', border: '1px solid rgba(71,85,105,0.4)', borderRadius: 6, padding: '10px 20px', fontSize: 15, fontFamily: 'monospace', letterSpacing: 1, textDecoration: 'none', cursor: 'pointer', display: 'inline-block' } as React.CSSProperties,
+  sectionTitle: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 } as React.CSSProperties,
+  groupTitle: { fontSize: 12, color: '#22d3ee', letterSpacing: 4, textTransform: 'uppercase', fontFamily: 'monospace' } as React.CSSProperties,
+  divider: { flex: 1, height: 1, background: 'linear-gradient(90deg, rgba(34,211,238,0.3), transparent)' } as React.CSSProperties,
+}
+
 export default function NewImportPage() {
   const [code, setCode] = useState('')
   const [mainProduct, setMainProduct] = useState('')
@@ -16,122 +32,113 @@ export default function NewImportPage() {
 
   async function saveImport(e: React.FormEvent) {
     e.preventDefault()
-
     const { error } = await supabase.from('imports').insert({
-      code,
-      main_product: mainProduct,
-      status,
+      code, main_product: mainProduct, status,
       order_date: orderDate || null,
       sailing_date: sailingDate || null,
       eta_port: etaPort || null,
       possible_delivery_date: possibleDeliveryDate || null,
-      risk,
-      notes,
+      risk, notes,
     })
-
-    if (error) {
-      alert('Error: ' + error.message)
-      return
-    }
-
-    alert('Importación creada')
+    if (error) { alert('Error: ' + error.message); return }
     window.location.href = '/'
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 p-10">
-      <h1 className="text-4xl font-bold mb-8">
-        Nueva Importación
-      </h1>
+    <main style={S.page}>
+      <style>{`* { box-sizing: border-box; margin: 0; padding: 0; } option { background: #0f172a; color: #94a3b8; } input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.5); } ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: #0f172a; } ::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 2px; } textarea::placeholder { color: #334155; } input::placeholder { color: #334155; }`}</style>
 
-      <form
-        onSubmit={saveImport}
-        className="bg-white rounded-2xl shadow p-6 max-w-xl space-y-4"
-      >
-        <input
-          className="w-full border p-3 rounded"
-          placeholder="Código ej: IMP-002"
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-        />
+      <header style={S.header}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ color: '#22d3ee', fontSize: 20 }}>▸</span>
+          <span style={S.title}>NUEVA IMPORTACIÓN</span>
+        </div>
+        <a href="/" style={S.btnGhost}>← Volver</a>
+      </header>
 
-        <input
-          className="w-full border p-3 rounded"
-          placeholder="Producto principal"
-          value={mainProduct}
-          onChange={(e) => setMainProduct(e.target.value)}
-        />
+      <div style={{ maxWidth: 680 }}>
+        <form onSubmit={saveImport}>
 
-        <select
-          className="w-full border p-3 rounded"
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-        >
-          <option>Pedido confirmado</option>
-          <option>En fabricación</option>
-          <option>Listo para embarcar</option>
-          <option>Embarcado</option>
-          <option>En tránsito</option>
-          <option>Arribado</option>
-          <option>En aduana</option>
-          <option>Nacionalizado</option>
-          <option>En depósito</option>
-          <option>Disponible</option>
-          <option>Cerrado</option>
-        </select>
+          <div style={S.card}>
+            <div style={S.sectionTitle}>
+              <span style={S.groupTitle}>◈ Identificación</span>
+              <div style={S.divider} />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div>
+                <label style={S.label}>Código</label>
+                <input style={S.input} placeholder="ej: IMP-003" value={code} onChange={e => setCode(e.target.value)} required />
+              </div>
+              <div>
+                <label style={S.label}>Estado</label>
+                <select style={S.select} value={status} onChange={e => setStatus(e.target.value)}>
+                  <option>Pedido confirmado</option>
+                  <option>En fabricación</option>
+                  <option>Listo para embarcar</option>
+                  <option>Embarcado</option>
+                  <option>En tránsito</option>
+                  <option>Arribado</option>
+                  <option>En aduana</option>
+                  <option>Nacionalizado</option>
+                  <option>En depósito</option>
+                  <option>Disponible</option>
+                  <option>Cerrado</option>
+                </select>
+              </div>
+            </div>
+            <label style={S.label}>Producto principal</label>
+            <input style={S.input} placeholder="ej: Calzado deportivo" value={mainProduct} onChange={e => setMainProduct(e.target.value)} />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div>
+                <label style={S.label}>Riesgo</label>
+                <select style={S.select} value={risk} onChange={e => setRisk(e.target.value)}>
+                  <option>Bajo</option>
+                  <option>Medio</option>
+                  <option>Alto</option>
+                </select>
+              </div>
+            </div>
+          </div>
 
-        <label className="font-semibold">Fecha pago orden de compra</label>
-        <input
-          type="date"
-          className="w-full border p-3 rounded"
-          value={orderDate}
-          onChange={(e) => setOrderDate(e.target.value)}
-        />
+          <div style={S.card}>
+            <div style={S.sectionTitle}>
+              <span style={S.groupTitle}>◈ Fechas</span>
+              <div style={S.divider} />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div>
+                <label style={S.label}>Fecha pago orden de compra</label>
+                <input type="date" style={S.input} value={orderDate} onChange={e => setOrderDate(e.target.value)} />
+              </div>
+              <div>
+                <label style={S.label}>Delivery posible</label>
+                <input type="date" style={S.input} value={possibleDeliveryDate} onChange={e => setPossibleDeliveryDate(e.target.value)} />
+              </div>
+              <div>
+                <label style={S.label}>Fecha de zarpe</label>
+                <input type="date" style={S.input} value={sailingDate} onChange={e => setSailingDate(e.target.value)} />
+              </div>
+              <div>
+                <label style={S.label}>ETA Puerto</label>
+                <input type="date" style={S.input} value={etaPort} onChange={e => setEtaPort(e.target.value)} />
+              </div>
+            </div>
+          </div>
 
-        <label className="font-semibold">Fecha de zarpe</label>
-        <input
-          type="date"
-          className="w-full border p-3 rounded"
-          value={sailingDate}
-          onChange={(e) => setSailingDate(e.target.value)}
-        />
+          <div style={S.card}>
+            <div style={S.sectionTitle}>
+              <span style={S.groupTitle}>◈ Observaciones</span>
+              <div style={S.divider} />
+            </div>
+            <textarea style={S.textarea} placeholder="Notas adicionales..." value={notes} onChange={e => setNotes(e.target.value)} />
+          </div>
 
-        <label className="font-semibold">ETA Puerto</label>
-        <input
-          type="date"
-          className="w-full border p-3 rounded"
-          value={etaPort}
-          onChange={(e) => setEtaPort(e.target.value)}
-        />
-
-        <input
-          type="date"
-          className="w-full border p-3 rounded"
-          value={possibleDeliveryDate}
-          onChange={(e) => setPossibleDeliveryDate(e.target.value)}
-        />
-
-        <select
-          className="w-full border p-3 rounded"
-          value={risk}
-          onChange={(e) => setRisk(e.target.value)}
-        >
-          <option>Bajo</option>
-          <option>Medio</option>
-          <option>Alto</option>
-        </select>
-
-        <textarea
-          className="w-full border p-3 rounded"
-          placeholder="Observaciones"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-        />
-
-        <button className="bg-black text-white px-6 py-3 rounded-xl">
-          Guardar importación
-        </button>
-      </form>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button type="submit" style={S.btnPrimary}>Guardar importación</button>
+            <a href="/" style={S.btnGhost}>Cancelar</a>
+          </div>
+        </form>
+      </div>
     </main>
   )
 }
