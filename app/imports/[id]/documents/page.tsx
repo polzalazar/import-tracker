@@ -45,8 +45,7 @@ export default function ImportDocumentsPage({ params }: { params: Promise<{ id: 
           {importCode && <span style={{ fontSize: 14, color: '#7c3aed', background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.25)', borderRadius: 4, padding: '3px 12px', letterSpacing: 2 }}>{importCode}</span>}
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <a href={`/imports/${id}`} style={S.btnGhost}>← Editar</a>
-          <a href="/" style={S.btnGhost}>Inicio</a>
+          <a href="/" style={S.btnGhost}>← Volver</a>
           <a href="/documents" style={{ ...S.btnGhost, color: '#7c3aed', borderColor: 'rgba(124,58,237,0.3)', background: 'rgba(124,58,237,0.06)' }}>+ Subir</a>
         </div>
       </header>
