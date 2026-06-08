@@ -119,8 +119,8 @@ export default function Home() {
         </div>
         <nav style={styles.nav}>
           <a href="/new-import" style={styles.btnPrimary}>+ Nueva importación</a>
-          <a href="/documents" style={styles.btnGhost}>Documentos</a>
-          <a href="/payments" style={styles.btnGhost}>Pagos</a>
+          <a href="/documents" style={{ ...styles.btnGhost, color: '#a78bfa', border: '1px solid rgba(167,139,250,0.4)', background: 'rgba(167,139,250,0.05)' }}>Documentos</a>
+          <a href="/payments" style={{ ...styles.btnGhost, color: '#fbbf24', border: '1px solid rgba(251,191,36,0.4)', background: 'rgba(251,191,36,0.05)' }}>Pagos</a>
           <button onClick={logout} style={{ ...styles.btnGhost, cursor: 'pointer', border: '1px solid rgba(248,113,113,0.4)', color: '#f87171', background: 'rgba(248,113,113,0.05)' }}>
             Salir
           </button>
