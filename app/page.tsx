@@ -343,7 +343,7 @@ function ImportCard({ item, today }: any) {
         <div style={{ marginBottom: 10 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: 14, fontFamily: 'monospace', color: '#94a3b8', letterSpacing: 1 }}>
             <span>📋 {formatDate(item.order_date)}</span>
-            <span style={{ color: orderPct >= 100 ? '#f87171' : '#fb923c', fontWeight: 700 }}>{Math.round(orderPct)}%</span>
+            <span style={{ color: orderPct >= 100 ? '#f87171' : '#fb923c', fontWeight: 700 }}>PRODUCCIÓN &nbsp;{Math.round(orderPct)}%</span>
             <span>📦 {formatDate(item.possible_delivery_date)}</span>
           </div>
           <div style={{ position: 'relative', height: 12, background: 'rgba(251,146,60,0.08)', borderRadius: 6, overflow: 'visible' }}>
@@ -358,7 +358,7 @@ function ImportCard({ item, today }: any) {
         <div style={{ marginBottom: 14 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: 14, fontFamily: 'monospace', color: '#94a3b8', letterSpacing: 1 }}>
             <span>⚓ {formatDate(item.sailing_date)}</span>
-            <span style={{ color: sailingPct >= 100 ? '#fb923c' : '#22d3ee', fontWeight: 700 }}>{Math.round(sailingPct)}%</span>
+            <span style={{ color: sailingPct >= 100 ? '#fb923c' : '#22d3ee', fontWeight: 700 }}>TRÁNSITO &nbsp;{Math.round(sailingPct)}%</span>
             <span>🏁 {formatDate(item.eta_port)}</span>
           </div>
           <div style={{ position: 'relative', height: 12, background: 'rgba(34,211,238,0.08)', borderRadius: 6, overflow: 'visible' }}>
@@ -428,8 +428,8 @@ function ImportCard({ item, today }: any) {
       {/* Actions */}
       <div style={{ display: 'flex', gap: 10, borderTop: '1px solid rgba(34,211,238,0.08)', paddingTop: 14 }}>
         <a href={`/imports/${item.id}`} style={styles.actionBtn}>Editar</a>
-        <a href={`/imports/${item.id}/documents`} style={styles.actionBtnGhost}>Documentos</a>
-        <a href={`/payments?importId=${item.id}`} style={styles.actionBtnGhost}>Pagos</a>
+        <a href={`/imports/${item.id}/documents`} style={styles.actionBtnDocs}>Documentos</a>
+        <a href={`/payments?importId=${item.id}`} style={styles.actionBtnPayments}>Pagos</a>
       </div>
     </div>
   )
@@ -673,9 +673,15 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '8px 16px', fontSize: 17, fontFamily: 'monospace',
     textDecoration: 'none', letterSpacing: 1,
   },
-  actionBtnGhost: {
-    background: 'transparent', color: '#475569',
-    border: '1px solid rgba(71,85,105,0.3)', borderRadius: 5,
+  actionBtnDocs: {
+    background: 'rgba(167,139,250,0.1)', color: '#a78bfa',
+    border: '1px solid rgba(167,139,250,0.3)', borderRadius: 5,
+    padding: '8px 16px', fontSize: 17, fontFamily: 'monospace',
+    textDecoration: 'none', letterSpacing: 1,
+  },
+  actionBtnPayments: {
+    background: 'rgba(251,191,36,0.1)', color: '#fbbf24',
+    border: '1px solid rgba(251,191,36,0.3)', borderRadius: 5,
     padding: '8px 16px', fontSize: 17, fontFamily: 'monospace',
     textDecoration: 'none', letterSpacing: 1,
   },
