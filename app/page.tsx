@@ -168,7 +168,7 @@ export default function Home() {
                       </span>
                       <span style={{ color: '#22d3ee', fontFamily: 'monospace', fontSize: 21, fontWeight: 700, minWidth: 110 }}>{importCode}</span>
                       <span style={{ color: '#cbd5e1', fontFamily: 'monospace', fontSize: 21, flex: 1 }}>{payment.concept}</span>
-                      <span style={{ color: '#f87171', fontFamily: 'monospace', fontSize: 21, fontWeight: 700 }}>{amount}</span>
+                      <span style={{ color: payment.currency === 'USD' ? '#22d3ee' : '#f87171', fontFamily: 'monospace', fontSize: 21, fontWeight: 700 }}>{amount}</span>
                     </div>
                   )
                 })}
