@@ -42,6 +42,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('Estado')
+  const [bnaRate, setBnaRate] = useState<{ venta: number; fecha: string } | null>(null)
 
   useEffect(() => {
     async function loadData() {
@@ -57,6 +58,10 @@ export default function Home() {
       setLoading(false)
     }
     loadData()
+    fetch('https://dolarapi.com/v1/dolares/oficial')
+      .then(r => r.json())
+      .then(d => setBnaRate({ venta: d.venta, fecha: d.fechaActualizacion?.slice(0, 10) || '' }))
+      .catch(() => {})
   }, [])
 
   async function logout() {
@@ -208,7 +213,7 @@ export default function Home() {
 
       {/* IMPORT CARDS */}
       <div style={styles.cardsGrid}>
-        {filteredData.map(item => <ImportCard key={item.id} item={item} today={today} />)}
+        {filteredData.map(item => <ImportCard key={item.id} item={item} today={today} bnaRate={bnaRate} />)}
       </div>
 
       <style>{`
@@ -261,7 +266,7 @@ function SectionTitle({ children }: any) {
   )
 }
 
-function ImportCard({ item, today }: any) {
+function ImportCard({ item, today, bnaRate }: any) {
   const itemPayments = item.payments || []
   const paidTotal = itemPayments.filter((p: any) => p.status?.toLowerCase() === 'pagado').reduce((t: number, p: any) => t + Number(p.amount || 0), 0)
   const pendingPayments = itemPayments.filter((p: any) => p.status?.toLowerCase() !== 'pagado')
@@ -412,7 +417,21 @@ function ImportCard({ item, today }: any) {
         </div>
         <div style={styles.miniBlock}>
           <span style={styles.miniBlockTitle}>ARCA</span>
-          <DataRow label="Estimado" value={money(item.arca_estimated, 'ARS')} small />
+          {item.arca_usd ? (
+            <>
+              <DataRow label="USD" value={`U$S ${Number(item.arca_usd).toLocaleString('es-AR')}`} small />
+              {bnaRate ? (
+                <>
+                  <DataRow label="ARS est." value={`$ ${Math.round(Number(item.arca_usd) * bnaRate.venta).toLocaleString('es-AR')}`} small accent="#f97316" />
+                  <DataRow label="TC BNA" value={`$ ${bnaRate.venta.toLocaleString('es-AR')}`} small />
+                </>
+              ) : (
+                <DataRow label="ARS est." value="..." small />
+              )}
+            </>
+          ) : (
+            <DataRow label="Estimado" value={money(item.arca_estimated, 'ARS')} small />
+          )}
           <DataRow label="Pago" value={formatDate(item.arca_payment_date)} small />
           <DataRow label="Estado" value={item.arca_status || 'Pendiente'} small />
         </div>

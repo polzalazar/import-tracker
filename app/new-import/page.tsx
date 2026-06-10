@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 
 const S = {
@@ -29,6 +29,15 @@ export default function NewImportPage() {
   const [possibleDeliveryDate, setPossibleDeliveryDate] = useState('')
   const [risk, setRisk] = useState('Medio')
   const [notes, setNotes] = useState('')
+  const [arcaUsd, setArcaUsd] = useState('')
+  const [bnaRate, setBnaRate] = useState<{ venta: number; fecha: string } | null>(null)
+
+  useEffect(() => {
+    fetch('https://dolarapi.com/v1/dolares/oficial')
+      .then(r => r.json())
+      .then(d => setBnaRate({ venta: d.venta, fecha: d.fechaActualizacion?.slice(0, 10) || '' }))
+      .catch(() => {})
+  }, [])
 
   async function saveImport(e: React.FormEvent) {
     e.preventDefault()
@@ -39,6 +48,7 @@ export default function NewImportPage() {
       eta_port: etaPort || null,
       possible_delivery_date: possibleDeliveryDate || null,
       risk, notes,
+      arca_usd: arcaUsd || null,
     })
     if (error) { alert('Error: ' + error.message); return }
     window.location.href = '/'
@@ -122,6 +132,21 @@ export default function NewImportPage() {
                 <input type="date" style={S.input} value={etaPort} onChange={e => setEtaPort(e.target.value)} />
               </div>
             </div>
+          </div>
+
+          <div style={S.card}>
+            <div style={S.sectionTitle}>
+              <span style={S.groupTitle}>◈ ARCA</span>
+              <div style={S.divider} />
+            </div>
+            <label style={S.label}>Monto (USD)</label>
+            <input style={S.input} type="number" step="0.01" min="0" placeholder="0.00"
+              value={arcaUsd} onChange={e => setArcaUsd(e.target.value)} />
+            {arcaUsd && bnaRate && (
+              <div style={{ marginTop: 6, fontSize: 12, color: '#94a3b8', fontFamily: 'monospace' }}>
+                ≈ $ {Math.round(Number(arcaUsd) * bnaRate.venta).toLocaleString('es-AR')} · TC BNA: ${bnaRate.venta.toLocaleString('es-AR')} ({bnaRate.fecha})
+              </div>
+            )}
           </div>
 
           <div style={S.card}>

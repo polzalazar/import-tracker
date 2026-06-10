@@ -33,11 +33,12 @@ export default function EditImportPage({ params }: { params: Promise<{ id: strin
   const [risk, setRisk] = useState('')
   const [notes, setNotes] = useState('')
   const [manufacturerCost, setManufacturerCost] = useState('')
-  const [arcaEstimated, setArcaEstimated] = useState('')
+  const [arcaUsd, setArcaUsd] = useState('')
   const [arcaStatus, setArcaStatus] = useState('Pendiente')
   const [arcaPaymentDate, setArcaPaymentDate] = useState('')
   const [payments, setPayments] = useState<any[]>([])
   const [documents, setDocuments] = useState<any[]>([])
+  const [bnaRate, setBnaRate] = useState<{ venta: number; fecha: string } | null>(null)
 
   useEffect(() => {
     async function loadImport() {
@@ -53,7 +54,7 @@ export default function EditImportPage({ params }: { params: Promise<{ id: strin
       setRisk(data.risk || '')
       setNotes(data.notes || '')
       setManufacturerCost(data.manufacturer_cost || '')
-      setArcaEstimated(data.arca_estimated || '')
+      setArcaUsd(data.arca_usd || '')
       setArcaStatus(data.arca_status || 'Pendiente')
       setArcaPaymentDate(data.arca_payment_date || '')
 
@@ -63,6 +64,10 @@ export default function EditImportPage({ params }: { params: Promise<{ id: strin
       setDocuments(documentsData || [])
     }
     loadImport()
+    fetch('https://dolarapi.com/v1/dolares/oficial')
+      .then(r => r.json())
+      .then(d => setBnaRate({ venta: d.venta, fecha: d.fechaActualizacion?.slice(0, 10) || '' }))
+      .catch(() => {})
   }, [id])
 
   async function deleteImport() {
@@ -79,7 +84,7 @@ export default function EditImportPage({ params }: { params: Promise<{ id: strin
       order_date: orderDate || null, sailing_date: sailingDate || null,
       eta_port: etaPort || null, possible_delivery_date: possibleDeliveryDate || null,
       risk, notes, manufacturer_cost: manufacturerCost || null,
-      arca_estimated: arcaEstimated || null, arca_status: arcaStatus, arca_payment_date: arcaPaymentDate || null,
+      arca_usd: arcaUsd || null, arca_status: arcaStatus, arca_payment_date: arcaPaymentDate || null,
     }).eq('id', id)
     if (error) { alert('Error: ' + error.message); return }
     window.location.href = '/'
@@ -182,10 +187,15 @@ export default function EditImportPage({ params }: { params: Promise<{ id: strin
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div>
-                <label style={S.label}>Estimado (ARS)</label>
+                <label style={S.label}>Monto (USD)</label>
                 <input style={S.input} type="number" step="0.01" min="0" placeholder="0.00"
-                  value={arcaEstimated}
-                  onChange={e => setArcaEstimated(e.target.value)} />
+                  value={arcaUsd}
+                  onChange={e => setArcaUsd(e.target.value)} />
+                {arcaUsd && bnaRate && (
+                  <div style={{ marginTop: 6, fontSize: 12, color: '#94a3b8', fontFamily: 'monospace' }}>
+                    ≈ $ {Math.round(Number(arcaUsd) * bnaRate.venta).toLocaleString('es-AR')} · TC BNA: ${bnaRate.venta.toLocaleString('es-AR')} ({bnaRate.fecha})
+                  </div>
+                )}
               </div>
               <div>
                 <label style={S.label}>Estado</label>
