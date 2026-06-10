@@ -114,9 +114,9 @@ export default function Home() {
   }
 
   return (
-    <main style={styles.page}>
+    <main style={styles.page} className="itp-main">
       {/* HEADER */}
-      <header style={styles.header}>
+      <header style={styles.header} className="itp-header">
         <div style={styles.logoWrap}>
           <span style={styles.logoAccent}>▸</span>
           <span style={styles.logoText}>IMPORT TRACKER</span>
@@ -167,20 +167,20 @@ export default function Home() {
                   const importCode = data.find(i => i.id === payment.import_id)?.code || '—'
                   const amount = payment.currency === 'USD' ? money(payment.amount, 'USD') : money(payment.amount, 'ARS')
                   return (
-                    <div key={payment.id} style={styles.upcomingRow}>
-                      <span style={{ color: '#d97706', fontFamily: 'monospace', fontSize: 18, fontWeight: 700, minWidth: 150, letterSpacing: 1 }}>
+                    <div key={payment.id} style={styles.upcomingRow} className="itp-upcoming-row">
+                      <span className="itp-upcoming-date" style={{ color: '#d97706', fontFamily: 'monospace', fontSize: 18, fontWeight: 700, minWidth: 150, letterSpacing: 1 }}>
                         {new Date(payment.due_date + 'T00:00:00').toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase()}
                       </span>
-                      <span style={{ color: '#0891b2', fontFamily: 'monospace', fontSize: 18, fontWeight: 700, minWidth: 110 }}>{importCode}</span>
-                      <span style={{ color: '#475569', fontFamily: 'monospace', fontSize: 18, flex: 1 }}>{payment.concept}</span>
-                      <span style={{ color: payment.currency === 'USD' ? '#0891b2' : '#dc2626', fontFamily: 'monospace', fontSize: 18, fontWeight: 700 }}>{amount}</span>
+                      <span className="itp-upcoming-code" style={{ color: '#0891b2', fontFamily: 'monospace', fontSize: 18, fontWeight: 700, minWidth: 110 }}>{importCode}</span>
+                      <span className="itp-upcoming-concept" style={{ color: '#475569', fontFamily: 'monospace', fontSize: 18, flex: 1 }}>{payment.concept}</span>
+                      <span className="itp-upcoming-amount" style={{ color: payment.currency === 'USD' ? '#0891b2' : '#dc2626', fontFamily: 'monospace', fontSize: 18, fontWeight: 700 }}>{amount}</span>
                     </div>
                   )
                 })}
               </div>
             </div>
           )}
-          <div style={{ flex: '0 0 420px', minWidth: 300, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 8, padding: '14px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+          <div className="itp-chart-card" style={{ flex: '0 0 420px', minWidth: 300, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 8, padding: '14px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
             <SectionTitle>Pagos pendientes / mes</SectionTitle>
             <MonthlyPaymentsChart payments={payments} />
           </div>
@@ -212,7 +212,7 @@ export default function Home() {
       </section>
 
       {/* IMPORT CARDS */}
-      <div style={styles.cardsGrid}>
+      <div style={styles.cardsGrid} className="itp-cards-grid">
         {filteredData.map(item => <ImportCard key={item.id} item={item} today={today} bnaRate={bnaRate} />)}
       </div>
 
@@ -224,6 +224,18 @@ export default function Home() {
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
         input::placeholder { color: #94a3b8; }
         option { background: #ffffff; color: #0f172a; }
+
+        @media (max-width: 640px) {
+          .itp-main { padding-left: 12px !important; padding-right: 12px !important; }
+          .itp-header { flex-wrap: wrap; gap: 10px; padding-bottom: 14px; }
+          .itp-cards-grid { grid-template-columns: 1fr !important; }
+          .itp-chart-card { flex: 1 1 100% !important; min-width: 0 !important; }
+          .itp-upcoming-row { flex-wrap: wrap !important; gap: 4px 12px !important; padding: 10px 12px !important; }
+          .itp-upcoming-date { font-size: 13px !important; min-width: 0 !important; width: 100%; }
+          .itp-upcoming-code { font-size: 13px !important; min-width: 0 !important; }
+          .itp-upcoming-concept { font-size: 13px !important; flex: unset !important; }
+          .itp-upcoming-amount { font-size: 13px !important; margin-left: auto; }
+        }
       `}</style>
     </main>
   )
