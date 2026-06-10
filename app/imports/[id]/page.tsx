@@ -170,9 +170,9 @@ export default function EditImportPage({ params }: { params: Promise<{ id: strin
               <div style={S.divider} />
             </div>
             <label style={S.label}>Costo total (USD)</label>
-            <input style={S.input} type="text"
-              value={Number(manufacturerCost || 0).toLocaleString('es-AR')}
-              onChange={e => setManufacturerCost(e.target.value.replace(/\./g, ''))} />
+            <input style={S.input} type="number" step="0.01" min="0" placeholder="0.00"
+              value={manufacturerCost}
+              onChange={e => setManufacturerCost(e.target.value)} />
           </div>
 
           <div style={S.card}>
@@ -183,9 +183,9 @@ export default function EditImportPage({ params }: { params: Promise<{ id: strin
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div>
                 <label style={S.label}>Estimado (ARS)</label>
-                <input style={S.input} type="text"
-                  value={Number(arcaEstimated || 0).toLocaleString('es-AR')}
-                  onChange={e => setArcaEstimated(e.target.value.replace(/\./g, ''))} />
+                <input style={S.input} type="number" step="0.01" min="0" placeholder="0.00"
+                  value={arcaEstimated}
+                  onChange={e => setArcaEstimated(e.target.value)} />
               </div>
               <div>
                 <label style={S.label}>Estado</label>
