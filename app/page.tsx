@@ -73,15 +73,22 @@ export default function Home() {
   const active = data.filter(i => i.status !== 'Cerrado').length
   const nextDeliveries = data.filter(i => i.possible_delivery_date).length
 
-  const usdPayments = payments.filter(p => p.currency === 'USD')
-  const usdCommitted = usdPayments.reduce((t, p) => t + Number(p.amount || 0), 0)
-  const usdPaid = usdPayments.filter(p => p.status === 'Pagado').reduce((t, p) => t + Number(p.amount || 0), 0)
-  const usdPending = usdCommitted - usdPaid
+  const arcaRate = bnaRate?.venta || 0
 
-  const arsPayments = payments.filter(p => p.currency === 'ARS')
-  const arsCommitted = arsPayments.reduce((t, p) => t + Number(p.amount || 0), 0)
-  const arsPaid = arsPayments.filter(p => p.status === 'Pagado').reduce((t, p) => t + Number(p.amount || 0), 0)
-  const arsPending = arsCommitted - arsPaid
+  // ARCA se ingresa en USD pero se paga en ARS al tipo BNA
+  const arcaPayments    = payments.filter(p => p.concept === 'ARCA')
+  const usdPayments     = payments.filter(p => p.currency === 'USD' && p.concept !== 'ARCA')
+  const arsNativePayments = payments.filter(p => p.currency === 'ARS' && p.concept !== 'ARCA')
+
+  const usdCommitted = usdPayments.reduce((t, p) => t + Number(p.amount || 0), 0)
+  const usdPaid      = usdPayments.filter(p => p.status === 'Pagado').reduce((t, p) => t + Number(p.amount || 0), 0)
+  const usdPending   = usdCommitted - usdPaid
+
+  const arsCommitted = arsNativePayments.reduce((t, p) => t + Number(p.amount || 0), 0)
+                     + arcaPayments.reduce((t, p) => t + Number(p.amount || 0) * arcaRate, 0)
+  const arsPaid      = arsNativePayments.filter(p => p.status === 'Pagado').reduce((t, p) => t + Number(p.amount || 0), 0)
+                     + arcaPayments.filter(p => p.status === 'Pagado').reduce((t, p) => t + Number(p.amount || 0) * arcaRate, 0)
+  const arsPending   = arsCommitted - arsPaid
 
   const today = new Date().toISOString().split('T')[0]
   const overduePayments = payments.filter(p => p.status !== 'Pagado' && p.due_date && p.due_date < today).length
@@ -165,7 +172,11 @@ export default function Home() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {upcomingPayments.map((payment: any) => {
                   const importCode = data.find(i => i.id === payment.import_id)?.code || '—'
-                  const amount = payment.currency === 'USD' ? money(payment.amount, 'USD') : money(payment.amount, 'ARS')
+                  const isArca = payment.concept === 'ARCA'
+                  const amount = isArca && arcaRate
+                    ? money(Math.round(Number(payment.amount) * arcaRate), 'ARS')
+                    : payment.currency === 'USD' ? money(payment.amount, 'USD') : money(payment.amount, 'ARS')
+                  const amountColor = isArca || payment.currency === 'ARS' ? '#dc2626' : '#0891b2'
                   return (
                     <div key={payment.id} style={styles.upcomingRow} className="itp-upcoming-row">
                       <span className="itp-upcoming-date" style={{ color: '#d97706', fontFamily: 'monospace', fontSize: 18, fontWeight: 700, minWidth: 150, letterSpacing: 1 }}>
@@ -173,7 +184,7 @@ export default function Home() {
                       </span>
                       <span className="itp-upcoming-code" style={{ color: '#0891b2', fontFamily: 'monospace', fontSize: 18, fontWeight: 700, minWidth: 110 }}>{importCode}</span>
                       <span className="itp-upcoming-concept" style={{ color: '#475569', fontFamily: 'monospace', fontSize: 18, flex: 1 }}>{payment.concept}</span>
-                      <span className="itp-upcoming-amount" style={{ color: payment.currency === 'USD' ? '#0891b2' : '#dc2626', fontFamily: 'monospace', fontSize: 18, fontWeight: 700 }}>{amount}</span>
+                      <span className="itp-upcoming-amount" style={{ color: amountColor, fontFamily: 'monospace', fontSize: 18, fontWeight: 700 }}>{amount}</span>
                     </div>
                   )
                 })}
@@ -182,7 +193,7 @@ export default function Home() {
           )}
           <div className="itp-chart-card" style={{ flex: '0 0 420px', minWidth: 300, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 8, padding: '14px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
             <SectionTitle>Pagos pendientes / mes</SectionTitle>
-            <MonthlyPaymentsChart payments={payments} />
+            <MonthlyPaymentsChart payments={payments} bnaRate={bnaRate} />
           </div>
         </div>
       </section>
@@ -482,7 +493,7 @@ function MiniStat({ label, value }: any) {
   )
 }
 
-function MonthlyPaymentsChart({ payments }: { payments: any[] }) {
+function MonthlyPaymentsChart({ payments, bnaRate }: { payments: any[], bnaRate: { venta: number; fecha: string } | null }) {
   const today = new Date()
   const MONTH_NAMES = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC']
 
@@ -499,8 +510,13 @@ function MonthlyPaymentsChart({ payments }: { payments: any[] }) {
   pending.forEach(p => {
     const key = p.due_date.slice(0, 7)
     if (key in usdByMonth) {
-      if (p.currency === 'USD') usdByMonth[key] += Number(p.amount || 0)
-      else arsByMonth[key] += Number(p.amount || 0)
+      if (p.concept === 'ARCA') {
+        arsByMonth[key] += Number(p.amount || 0) * (bnaRate?.venta || 0)
+      } else if (p.currency === 'USD') {
+        usdByMonth[key] += Number(p.amount || 0)
+      } else {
+        arsByMonth[key] += Number(p.amount || 0)
+      }
     }
   })
 
