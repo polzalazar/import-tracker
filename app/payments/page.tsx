@@ -40,6 +40,7 @@ export default function PaymentsPage() {
   const [currency, setCurrency] = useState('USD')
   const [dueDate, setDueDate] = useState('')
   const [status, setStatus] = useState('Pendiente')
+  const [historyFilter, setHistoryFilter] = useState<'Todos' | 'Pendiente' | 'Pagado'>('Todos')
 
   useEffect(() => {
     const importIdFromUrl = new URLSearchParams(window.location.search).get('importId')
@@ -65,11 +66,41 @@ export default function PaymentsPage() {
     loadData()
   }
 
+  const filteredPayments = payments
+    .filter(p => historyFilter === 'Todos' || p.status === historyFilter)
+    .sort((a, b) => {
+      if (historyFilter === 'Todos') return 0
+      if (!a.due_date) return 1
+      if (!b.due_date) return -1
+      return a.due_date.localeCompare(b.due_date)
+    })
+
+  const filterBtn = (label: 'Todos' | 'Pendiente' | 'Pagado', color: string) => ({
+    background: historyFilter === label ? color : '#ffffff',
+    color: historyFilter === label ? '#ffffff' : color,
+    border: `1px solid ${color}`,
+    borderRadius: 6, padding: '6px 16px', fontSize: 13,
+    fontFamily: 'monospace', letterSpacing: 1, cursor: 'pointer',
+  } as React.CSSProperties)
+
   return (
     <main style={S.page}>
-      <style>{`* { box-sizing: border-box; margin: 0; padding: 0; } option { background: #ffffff; color: #0f172a; } input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; } ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: #f1f5f9; } ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }`}</style>
+      <style>{`
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        option { background: #ffffff; color: #0f172a; }
+        input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+        @media print {
+          .no-print { display: none !important; }
+          body { background: #ffffff !important; }
+          .print-header { display: block !important; margin-bottom: 16px; font-family: monospace; font-size: 14px; color: #0f172a; }
+        }
+        .print-header { display: none; }
+      `}</style>
 
-      <header style={S.header}>
+      <header style={S.header} className="no-print">
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span style={{ color: '#d97706', fontSize: 20 }}>▸</span>
           <span style={S.title}>PAGOS</span>
@@ -78,7 +109,8 @@ export default function PaymentsPage() {
       </header>
 
       <div style={{ maxWidth: 780 }}>
-        <div style={S.card}>
+        {/* Nuevo pago - oculto al imprimir */}
+        <div style={S.card} className="no-print">
           <div style={S.sectionTitle}>
             <span style={S.groupTitle}>◈ Nuevo pago</span>
             <div style={S.divider} />
@@ -110,7 +142,7 @@ export default function PaymentsPage() {
               </div>
               <div>
                 <label style={S.label}>Monto</label>
-                <input style={S.input} type="number" placeholder="0" value={amount} onChange={e => setAmount(e.target.value)} />
+                <input style={S.input} type="number" step="0.01" placeholder="0" value={amount} onChange={e => setAmount(e.target.value)} />
               </div>
               <div>
                 <label style={S.label}>Moneda</label>
@@ -139,12 +171,32 @@ export default function PaymentsPage() {
           </form>
         </div>
 
-        <div style={S.sectionTitle}>
-          <span style={S.groupTitle}>◈ Historial</span>
-          <div style={S.divider} />
+        {/* Historial */}
+        <div style={{ ...S.sectionTitle, justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={S.groupTitle}>◈ Historial ({filteredPayments.length})</span>
+            <div style={S.divider} />
+          </div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }} className="no-print">
+            <button style={filterBtn('Todos', '#475569')} onClick={() => setHistoryFilter('Todos')}>Todos</button>
+            <button style={filterBtn('Pendiente', '#d97706')} onClick={() => setHistoryFilter('Pendiente')}>Pendiente</button>
+            <button style={filterBtn('Pagado', '#16a34a')} onClick={() => setHistoryFilter('Pagado')}>Pagado</button>
+            <button
+              style={{ ...S.btnGhost, padding: '6px 16px', fontSize: 13, marginLeft: 8 }}
+              onClick={() => window.print()}
+            >🖨 Imprimir</button>
+          </div>
         </div>
+
+        {/* Encabezado para impresión */}
+        <div className="print-header">
+          <strong>IMPORT TRACKER — HISTORIAL DE PAGOS</strong>
+          {historyFilter !== 'Todos' && <span> · Filtro: {historyFilter}</span>}
+          <span style={{ float: 'right' }}>{new Date().toLocaleDateString('es-AR')}</span>
+        </div>
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {payments.map(p => {
+          {filteredPayments.map(p => {
             const cc = conceptColor(p.concept)
             const isPaid = p.status === 'Pagado'
             return (
@@ -161,11 +213,16 @@ export default function PaymentsPage() {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <span style={{ fontSize: 12, color: isPaid ? '#16a34a' : '#d97706', background: isPaid ? 'rgba(22,163,74,0.1)' : 'rgba(217,119,6,0.1)', border: `1px solid ${isPaid ? 'rgba(22,163,74,0.3)' : 'rgba(217,119,6,0.3)'}`, borderRadius: 4, padding: '3px 10px', fontFamily: 'monospace' }}>{p.status}</span>
-                  <a href={`/payments/${p.id}`} style={{ ...S.btnGhost, padding: '6px 14px', fontSize: 13 }}>Editar</a>
+                  <a href={`/payments/${p.id}`} style={{ ...S.btnGhost, padding: '6px 14px', fontSize: 13 }} className="no-print">Editar</a>
                 </div>
               </div>
             )
           })}
+          {filteredPayments.length === 0 && (
+            <div style={{ ...S.card, color: '#94a3b8', textAlign: 'center', padding: '32px', marginBottom: 0 }}>
+              No hay pagos {historyFilter !== 'Todos' ? `con estado "${historyFilter}"` : ''}.
+            </div>
+          )}
         </div>
       </div>
     </main>
