@@ -18,6 +18,13 @@ const S = {
   divider: { flex: 1, height: 1, background: 'linear-gradient(90deg, rgba(8,145,178,0.3), transparent)' } as React.CSSProperties,
 }
 
+const MONTHS = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC']
+function formatDate(d: string | null) {
+  if (!d) return '—'
+  const [y, m, day] = d.split('-')
+  return `${Number(day)} ${MONTHS[Number(m) - 1]} ${y}`
+}
+
 function conceptColor(concept: string) {
   const map: Record<string, { color: string; bg: string }> = {
     'ANTICIPO FABRICANTE': { color: '#16a34a', bg: 'rgba(22,163,74,0.1)' },
@@ -208,7 +215,7 @@ export default function PaymentsPage() {
                   </div>
                   <div style={{ display: 'flex', gap: 20, fontSize: 15, color: '#94a3b8' }}>
                     <span style={{ color: '#0f172a', fontWeight: 700, fontFamily: 'monospace' }}>{p.currency === 'USD' ? `U$S ${Number(p.amount||0).toLocaleString('es-AR')}` : `$ ${Number(p.amount||0).toLocaleString('es-AR')}`}</span>
-                    <span style={{ fontFamily: 'monospace' }}>Vence: {p.due_date || '—'}</span>
+                    <span style={{ fontFamily: 'monospace' }}>Vence: {formatDate(p.due_date)}</span>
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
