@@ -77,7 +77,9 @@ export default function Home() {
 
   // ARCA se ingresa en USD pero se paga en ARS al tipo BNA
   const arcaPayments    = payments.filter(p => p.concept === 'ARCA')
-  const usdPayments     = payments.filter(p => p.currency === 'USD' && p.concept !== 'ARCA')
+  // Si aún no cargó el tipo de cambio, los ARCA caen al track USD para no ocultarlos
+  const arcaHasRate     = arcaRate > 0
+  const usdPayments     = payments.filter(p => p.currency === 'USD' && (arcaHasRate ? p.concept !== 'ARCA' : true))
   const arsNativePayments = payments.filter(p => p.currency === 'ARS' && p.concept !== 'ARCA')
 
   const usdCommitted = usdPayments.reduce((t, p) => t + Number(p.amount || 0), 0)
@@ -85,9 +87,9 @@ export default function Home() {
   const usdPending   = usdCommitted - usdPaid
 
   const arsCommitted = arsNativePayments.reduce((t, p) => t + Number(p.amount || 0), 0)
-                     + arcaPayments.reduce((t, p) => t + Number(p.amount || 0) * arcaRate, 0)
+                     + (arcaHasRate ? arcaPayments.reduce((t, p) => t + Number(p.amount || 0) * arcaRate, 0) : 0)
   const arsPaid      = arsNativePayments.filter(p => p.status === 'Pagado').reduce((t, p) => t + Number(p.amount || 0), 0)
-                     + arcaPayments.filter(p => p.status === 'Pagado').reduce((t, p) => t + Number(p.amount || 0) * arcaRate, 0)
+                     + (arcaHasRate ? arcaPayments.filter(p => p.status === 'Pagado').reduce((t, p) => t + Number(p.amount || 0) * arcaRate, 0) : 0)
   const arsPending   = arsCommitted - arsPaid
 
   const today = new Date().toISOString().split('T')[0]
@@ -138,6 +140,10 @@ export default function Home() {
           </button>
         </nav>
       </header>
+      {bnaRate
+        ? <div style={{ fontSize: 11, color: '#16a34a', fontFamily: 'monospace', marginBottom: 8, marginTop: -12 }}>TC BNA: $ {bnaRate.venta.toLocaleString('es-AR')} ({bnaRate.fecha})</div>
+        : <div style={{ fontSize: 11, color: '#dc2626', fontFamily: 'monospace', marginBottom: 8, marginTop: -12 }}>TC BNA: no disponible — reintentando…</div>
+      }
 
       {/* KPI STRIP */}
       <section style={styles.kpiStrip}>
@@ -510,8 +516,8 @@ function MonthlyPaymentsChart({ payments, bnaRate }: { payments: any[], bnaRate:
   pending.forEach(p => {
     const key = p.due_date.slice(0, 7)
     if (key in usdByMonth) {
-      if (p.concept === 'ARCA') {
-        arsByMonth[key] += Number(p.amount || 0) * (bnaRate?.venta || 0)
+      if (p.concept === 'ARCA' && bnaRate) {
+        arsByMonth[key] += Number(p.amount || 0) * bnaRate.venta
       } else if (p.currency === 'USD') {
         usdByMonth[key] += Number(p.amount || 0)
       } else {
