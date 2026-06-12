@@ -75,22 +75,20 @@ export default function Home() {
 
   const arcaRate = bnaRate?.venta || 0
 
-  // ARCA se ingresa en USD pero se paga en ARS al tipo BNA
-  const arcaPayments    = payments.filter(p => p.concept === 'ARCA')
-  // Si aún no cargó el tipo de cambio, los ARCA caen al track USD para no ocultarlos
-  const arcaHasRate     = arcaRate > 0
-  const usdPayments     = payments.filter(p => p.currency === 'USD' && (arcaHasRate ? p.concept !== 'ARCA' : true))
-  const arsNativePayments = payments.filter(p => p.currency === 'ARS' && p.concept !== 'ARCA')
+  // ARCA viene de imports.arca_usd (lo mismo que muestran las tarjetas)
+  const arcaArs = arcaRate > 0
+    ? data.filter(i => i.status !== 'Cerrado' && i.arca_usd).reduce((t, i) => t + Number(i.arca_usd || 0) * arcaRate, 0)
+    : 0
+
+  const usdPayments = payments.filter(p => p.currency === 'USD')
+  const arsNativePayments = payments.filter(p => p.currency === 'ARS')
 
   const usdCommitted = usdPayments.reduce((t, p) => t + Number(p.amount || 0), 0)
   const usdPaid      = usdPayments.filter(p => p.status === 'Pagado').reduce((t, p) => t + Number(p.amount || 0), 0)
   const usdPending   = usdCommitted - usdPaid
 
-  const arsCommitted = arsNativePayments.reduce((t, p) => t + Number(p.amount || 0), 0)
-                     + (arcaHasRate ? arcaPayments.reduce((t, p) => t + Number(p.amount || 0) * arcaRate, 0) : 0)
-  const arsPaid      = arsNativePayments.filter(p => p.status === 'Pagado').reduce((t, p) => t + Number(p.amount || 0), 0)
-                     + (arcaHasRate ? arcaPayments.filter(p => p.status === 'Pagado').reduce((t, p) => t + Number(p.amount || 0) * arcaRate, 0) : 0)
-  const arsPending   = arsCommitted - arsPaid
+  const arsPendingNative = arsNativePayments.filter(p => p.status !== 'Pagado').reduce((t, p) => t + Number(p.amount || 0), 0)
+  const arsPending   = arcaArs + arsPendingNative
 
   const today = new Date().toISOString().split('T')[0]
   const overduePayments = payments.filter(p => p.status !== 'Pagado' && p.due_date && p.due_date < today).length
@@ -199,7 +197,7 @@ export default function Home() {
           )}
           <div className="itp-chart-card" style={{ flex: '0 0 420px', minWidth: 300, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 8, padding: '14px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
             <SectionTitle>Pagos pendientes / mes</SectionTitle>
-            <MonthlyPaymentsChart payments={payments} bnaRate={bnaRate} />
+            <MonthlyPaymentsChart payments={payments} imports={data} bnaRate={bnaRate} />
           </div>
         </div>
       </section>
@@ -499,7 +497,7 @@ function MiniStat({ label, value }: any) {
   )
 }
 
-function MonthlyPaymentsChart({ payments, bnaRate }: { payments: any[], bnaRate: { venta: number; fecha: string } | null }) {
+function MonthlyPaymentsChart({ payments, imports, bnaRate }: { payments: any[], imports: any[], bnaRate: { venta: number; fecha: string } | null }) {
   const today = new Date()
   const MONTH_NAMES = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC']
 
@@ -513,18 +511,23 @@ function MonthlyPaymentsChart({ payments, bnaRate }: { payments: any[], bnaRate:
   const usdByMonth: Record<string, number> = {}
   const arsByMonth: Record<string, number> = {}
   months.forEach(m => { usdByMonth[m.key] = 0; arsByMonth[m.key] = 0 })
+
+  // Pagos USD/ARS de la tabla payments
   pending.forEach(p => {
     const key = p.due_date.slice(0, 7)
     if (key in usdByMonth) {
-      if (p.concept === 'ARCA' && bnaRate) {
-        arsByMonth[key] += Number(p.amount || 0) * bnaRate.venta
-      } else if (p.currency === 'USD') {
-        usdByMonth[key] += Number(p.amount || 0)
-      } else {
-        arsByMonth[key] += Number(p.amount || 0)
-      }
+      if (p.currency === 'USD') usdByMonth[key] += Number(p.amount || 0)
+      else arsByMonth[key] += Number(p.amount || 0)
     }
   })
+
+  // ARCA de imports.arca_usd, usando eta_port como mes de referencia
+  if (bnaRate) {
+    imports.filter(i => i.status !== 'Cerrado' && i.arca_usd && i.eta_port).forEach(i => {
+      const key = i.eta_port.slice(0, 7)
+      if (key in arsByMonth) arsByMonth[key] += Number(i.arca_usd) * bnaRate.venta
+    })
+  }
 
   const maxUsd = Math.max(...Object.values(usdByMonth), 1)
   const maxArs = Math.max(...Object.values(arsByMonth), 1)
