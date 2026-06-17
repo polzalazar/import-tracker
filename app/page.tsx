@@ -293,6 +293,77 @@ function SectionTitle({ children }: any) {
   )
 }
 
+function printCard(item: any, bnaRate: any) {
+  const MONTHS = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC']
+  const fd = (d: string | null) => {
+    if (!d) return '—'
+    const [y, m, day] = d.split('-')
+    return `${Number(day)} ${MONTHS[Number(m) - 1]} ${y}`
+  }
+  const money = (v: any, cur: string) => {
+    const n = Number(v || 0)
+    return cur === 'USD' ? `U$S ${n.toLocaleString('es-AR')}` : `$ ${n.toLocaleString('es-AR')}`
+  }
+  const payments = (item.payments || []).filter((p: any) => p.status !== 'Pagado')
+    .sort((a: any, b: any) => (a.due_date || '').localeCompare(b.due_date || ''))
+  const paidTotal = (item.payments || []).filter((p: any) => p.status?.toLowerCase() === 'pagado')
+    .reduce((t: number, p: any) => t + Number(p.amount || 0), 0)
+  const arcaArs = item.arca_usd && bnaRate ? Math.round(Number(item.arca_usd) * bnaRate.venta) : null
+
+  const paymentsRows = payments.map((p: any) => `
+    <tr>
+      <td>${p.concept || '—'}</td>
+      <td>${p.currency === 'USD' ? money(p.amount, 'USD') : money(p.amount, 'ARS')}</td>
+      <td>${fd(p.due_date)}</td>
+      <td>${p.status || '—'}</td>
+    </tr>`).join('')
+
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8">
+  <title>${item.code}</title>
+  <style>
+    body { font-family: monospace; padding: 32px; color: #0f172a; font-size: 13px; }
+    h1 { font-size: 22px; letter-spacing: 2px; margin: 0 0 4px; }
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 4px; font-size: 11px; letter-spacing: 1px; border: 1px solid #e2e8f0; }
+    .section { margin-top: 18px; border-top: 1px solid #e2e8f0; padding-top: 10px; }
+    .row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .label { color: #94a3b8; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    th { text-align: left; font-size: 11px; color: #94a3b8; letter-spacing: 1px; border-bottom: 1px solid #e2e8f0; padding: 4px 6px; }
+    td { padding: 6px 6px; border-bottom: 1px solid #f1f5f9; }
+    .footer { margin-top: 24px; font-size: 11px; color: #94a3b8; }
+    @media print { body { padding: 16px; } }
+  </style></head><body>
+  <h1>${item.code}</h1>
+  <span class="badge">${item.status || '—'}</span>
+  <div class="section">
+    <div class="row"><span class="label">Producto</span><span>${item.main_product || '—'}</span></div>
+    <div class="row"><span class="label">ETA Puerto</span><span>${fd(item.eta_port)}</span></div>
+    <div class="row"><span class="label">Zarpe</span><span>${fd(item.sailing_date)}</span></div>
+    <div class="row"><span class="label">Delivery posible</span><span>${fd(item.possible_delivery_date)}</span></div>
+    <div class="row"><span class="label">Riesgo</span><span>${item.risk || '—'}</span></div>
+  </div>
+  <div class="section">
+    <div class="row"><span class="label">Costo fabricación</span><span>${money(item.manufacturer_cost, 'USD')}</span></div>
+    <div class="row"><span class="label">Pagado</span><span>${money(paidTotal, 'USD')}</span></div>
+    <div class="row"><span class="label">Pendiente</span><span>${money(Number(item.manufacturer_cost || 0) - paidTotal, 'USD')}</span></div>
+  </div>
+  <div class="section">
+    <div class="row"><span class="label">ARCA (USD)</span><span>${item.arca_usd ? money(item.arca_usd, 'USD') : '—'}</span></div>
+    ${arcaArs ? `<div class="row"><span class="label">ARCA (ARS est.)</span><span>$ ${arcaArs.toLocaleString('es-AR')}</span></div>
+    <div class="row"><span class="label">TC BNA</span><span>$ ${bnaRate.venta.toLocaleString('es-AR')} (${bnaRate.fecha})</span></div>` : ''}
+  </div>
+  ${payments.length > 0 ? `<div class="section"><b>PAGOS PENDIENTES</b>
+  <table><thead><tr><th>Concepto</th><th>Monto</th><th>Vencimiento</th><th>Estado</th></tr></thead>
+  <tbody>${paymentsRows}</tbody></table></div>` : ''}
+  ${item.notes ? `<div class="section"><span class="label">Notas</span><p>${item.notes}</p></div>` : ''}
+  <div class="footer">Impreso el ${fd(new Date().toISOString().slice(0, 10))} · IMPORT TRACKER</div>
+  <script>window.onload = () => { window.print(); window.onafterprint = () => window.close(); }</script>
+  </body></html>`
+
+  const w = window.open('', '_blank', 'width=700,height=900')
+  if (w) { w.document.write(html); w.document.close() }
+}
+
 function ImportCard({ item, today, bnaRate }: any) {
   const itemPayments = item.payments || []
   const paidTotal = itemPayments.filter((p: any) => p.status?.toLowerCase() === 'pagado').reduce((t: number, p: any) => t + Number(p.amount || 0), 0)
@@ -474,6 +545,7 @@ function ImportCard({ item, today, bnaRate }: any) {
         <a href={`/imports/${item.id}`} style={styles.actionBtn}>Editar</a>
         <a href={`/imports/${item.id}/documents`} style={styles.actionBtnDocs}>Documentos</a>
         <a href={`/payments?importId=${item.id}`} style={styles.actionBtnPayments}>Pagos</a>
+        <button onClick={() => printCard(item, bnaRate)} style={{ ...styles.actionBtn, background: '#ffffff', color: '#475569', border: '1px solid #e2e8f0', cursor: 'pointer' }}>🖨</button>
       </div>
     </div>
   )
