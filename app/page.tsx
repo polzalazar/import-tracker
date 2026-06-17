@@ -545,7 +545,7 @@ function ImportCard({ item, today, bnaRate }: any) {
         <a href={`/imports/${item.id}`} style={styles.actionBtn}>Editar</a>
         <a href={`/imports/${item.id}/documents`} style={styles.actionBtnDocs}>Documentos</a>
         <a href={`/payments?importId=${item.id}`} style={styles.actionBtnPayments}>Pagos</a>
-        <button onClick={() => printCard(item, bnaRate)} style={{ ...styles.actionBtn, background: '#ffffff', color: '#475569', border: '1px solid #e2e8f0', cursor: 'pointer' }}>🖨</button>
+        <button onClick={() => printCard(item, bnaRate)} style={{ flex: 1, background: 'rgba(100,116,139,0.08)', color: '#64748b', border: '1px solid rgba(100,116,139,0.3)', borderRadius: 6, padding: '8px 10px', fontFamily: 'monospace', fontSize: 13, letterSpacing: 1, textDecoration: 'none', textAlign: 'center', cursor: 'pointer' }}>Imprimir</button>
       </div>
     </div>
   )
