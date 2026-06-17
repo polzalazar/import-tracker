@@ -307,7 +307,12 @@ function printCard(el: HTMLElement) {
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:#fff;z-index:9999;padding:0;box-sizing:border-box;overflow:auto;'
   overlay.appendChild(clone)
   document.body.appendChild(overlay)
-  const cleanup = () => { document.body.removeChild(overlay); window.removeEventListener('afterprint', cleanup) }
+  document.body.classList.add('printing-card')
+  const cleanup = () => {
+    document.body.removeChild(overlay)
+    document.body.classList.remove('printing-card')
+    window.removeEventListener('afterprint', cleanup)
+  }
   window.addEventListener('afterprint', cleanup)
   window.print()
 }
