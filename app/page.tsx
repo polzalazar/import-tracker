@@ -295,11 +295,16 @@ function SectionTitle({ children }: any) {
 
 function printCard(el: HTMLElement) {
   const clone = el.cloneNode(true) as HTMLElement
-  // quitar el botón Imprimir del clon
   clone.querySelectorAll('button').forEach(b => { if (b.textContent?.includes('Imprimir')) b.remove() })
+  // expandir al ancho completo de la hoja
+  clone.style.width = '100%'
+  clone.style.maxWidth = 'none'
+  clone.style.boxSizing = 'border-box'
+  clone.style.boxShadow = 'none'
+  clone.style.borderRadius = '4px'
   const overlay = document.createElement('div')
   overlay.id = '__print_overlay__'
-  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:#fff;z-index:9999;padding:24px;box-sizing:border-box;overflow:auto;'
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:#fff;z-index:9999;padding:0;box-sizing:border-box;overflow:auto;'
   overlay.appendChild(clone)
   document.body.appendChild(overlay)
   const cleanup = () => { document.body.removeChild(overlay); window.removeEventListener('afterprint', cleanup) }
