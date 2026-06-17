@@ -26,3 +26,8 @@ html {
   html { font-size: 16px !important; }
   main { padding-left: 12px !important; padding-right: 12px !important; }
 }
+
+@media print {
+  body > *:not(#__print_overlay__) { display: none !important; }
+  #__print_overlay__ { position: static !important; height: auto !important; }
+}
