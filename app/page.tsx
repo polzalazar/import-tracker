@@ -43,6 +43,8 @@ export default function Home() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('Estado')
   const [bnaRate, setBnaRate] = useState<{ venta: number; fecha: string } | null>(null)
+  const [archivoSearch, setArchivoSearch] = useState('')
+  const [archivoOpen, setArchivoOpen] = useState(false)
 
   useEffect(() => {
     async function loadData() {
@@ -99,6 +101,7 @@ export default function Home() {
 
   const filteredData = data
     .filter(item => {
+      if (item.status === 'Cerrado') return false
       const matchesSearch = item.code?.toLowerCase().includes(search.toLowerCase()) || item.main_product?.toLowerCase().includes(search.toLowerCase())
       const matchesStatus = statusFilter === 'Estado' || item.status?.toLowerCase() === statusFilter.toLowerCase()
       return matchesSearch && matchesStatus
@@ -108,6 +111,11 @@ export default function Home() {
       if (!b.eta_port) return -1
       return a.eta_port.localeCompare(b.eta_port)
     })
+
+  const closedData = data
+    .filter(item => item.status === 'Cerrado')
+    .filter(item => !archivoSearch || item.code?.toLowerCase().includes(archivoSearch.toLowerCase()) || item.main_product?.toLowerCase().includes(archivoSearch.toLowerCase()))
+    .sort((a, b) => a.code?.localeCompare(b.code ?? '') ?? 0)
 
   if (loading) {
     return (
@@ -221,7 +229,7 @@ export default function Home() {
             onChange={e => setStatusFilter(e.target.value)}
           >
             <option>Estado</option>
-            {STATUS_ORDER.map(s => <option key={s}>{s}</option>)}
+            {STATUS_ORDER.filter(s => s !== 'Cerrado').map(s => <option key={s}>{s}</option>)}
           </select>
         </div>
       </section>
@@ -230,6 +238,34 @@ export default function Home() {
       <div style={styles.cardsGrid} className="itp-cards-grid">
         {filteredData.map(item => <ImportCard key={item.id} item={item} today={today} bnaRate={bnaRate} />)}
       </div>
+
+      {/* ARCHIVO — importaciones cerradas */}
+      <section style={{ marginTop: 32, borderTop: '1px solid #e2e8f0', paddingTop: 20 }}>
+        <button
+          onClick={() => setArchivoOpen(o => !o)}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, marginBottom: archivoOpen ? 16 : 0, padding: 0 }}
+        >
+          <span style={{ color: '#94a3b8', fontSize: 12, letterSpacing: 4, textTransform: 'uppercase', fontFamily: 'monospace' }}>◈ Archivo</span>
+          <span style={{ color: '#94a3b8', fontSize: 13, fontFamily: 'monospace' }}>({data.filter(i => i.status === 'Cerrado').length} cerradas)</span>
+          <span style={{ color: '#94a3b8', fontSize: 16, marginLeft: 4 }}>{archivoOpen ? '▲' : '▼'}</span>
+        </button>
+        {archivoOpen && (
+          <>
+            <input
+              style={{ ...styles.searchInput, marginBottom: 16, maxWidth: 340 }}
+              placeholder="Buscar en archivo..."
+              value={archivoSearch}
+              onChange={e => setArchivoSearch(e.target.value)}
+            />
+            <div style={styles.cardsGrid} className="itp-cards-grid">
+              {closedData.map(item => <ImportCard key={item.id} item={item} today={today} bnaRate={bnaRate} />)}
+              {closedData.length === 0 && (
+                <p style={{ color: '#94a3b8', fontFamily: 'monospace', fontSize: 14 }}>Sin resultados.</p>
+              )}
+            </div>
+          </>
+        )}
+      </section>
 
       <style>{`
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
