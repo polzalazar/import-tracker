@@ -73,7 +73,29 @@ export default function PaymentsPage() {
     loadData()
   }
 
-  const filteredPayments = payments
+  const importIdFromUrl = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('importId') : null
+
+  // Entradas sintéticas de ARCA desde imports (solo imports que tienen arca_estimated o arca_usd y no tienen ya un pago ARCA real)
+  const realArcaImportIds = new Set(payments.filter(p => p.concept === 'ARCA').map(p => p.import_id))
+  const arcaEntries = imports
+    .filter(i => (i.arca_estimated || i.arca_usd) && !realArcaImportIds.has(i.id))
+    .filter(i => !importIdFromUrl || i.id === importIdFromUrl)
+    .map(i => ({
+      id: `arca-${i.id}`,
+      import_id: i.id,
+      concept: 'ARCA',
+      amount: i.arca_estimated || 0,
+      currency: 'ARS',
+      due_date: i.arca_payment_date || null,
+      status: i.arca_status || 'Pendiente',
+      imports: { code: i.code },
+      _synthetic: true,
+      _importId: i.id,
+    }))
+
+  const allPayments = [...payments, ...arcaEntries]
+
+  const filteredPayments = allPayments
     .filter(p => historyFilter === 'Todos' || p.status === historyFilter)
     .sort((a, b) => {
       if (historyFilter === 'Todos') return 0
@@ -205,13 +227,14 @@ export default function PaymentsPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {filteredPayments.map(p => {
             const cc = conceptColor(p.concept)
-            const isPaid = p.status === 'Pagado'
+            const isPaid = p.status?.toLowerCase() === 'pagado'
             return (
               <div key={p.id} style={{ ...S.card, marginBottom: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
                     <span style={{ fontSize: 12, color: cc.color, background: cc.bg, border: `1px solid ${cc.color}40`, borderRadius: 4, padding: '2px 10px', letterSpacing: 1, fontFamily: 'monospace' }}>{p.concept}</span>
                     <span style={{ fontSize: 13, color: '#94a3b8', fontFamily: 'monospace' }}>{p.imports?.code}</span>
+                    {p._synthetic && <span style={{ fontSize: 11, color: '#94a3b8', fontFamily: 'monospace', letterSpacing: 1 }}>· desde import</span>}
                   </div>
                   <div style={{ display: 'flex', gap: 20, fontSize: 15, color: '#94a3b8' }}>
                     <span style={{ color: '#0f172a', fontWeight: 700, fontFamily: 'monospace' }}>{p.currency === 'USD' ? `U$S ${Number(p.amount||0).toLocaleString('es-AR')}` : `$ ${Number(p.amount||0).toLocaleString('es-AR')}`}</span>
@@ -220,7 +243,10 @@ export default function PaymentsPage() {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <span style={{ fontSize: 12, color: isPaid ? '#16a34a' : '#d97706', background: isPaid ? 'rgba(22,163,74,0.1)' : 'rgba(217,119,6,0.1)', border: `1px solid ${isPaid ? 'rgba(22,163,74,0.3)' : 'rgba(217,119,6,0.3)'}`, borderRadius: 4, padding: '3px 10px', fontFamily: 'monospace' }}>{p.status}</span>
-                  <a href={`/payments/${p.id}`} style={{ ...S.btnGhost, padding: '6px 14px', fontSize: 13 }} className="no-print">Editar</a>
+                  {p._synthetic
+                    ? <a href={`/imports/${p._importId}`} style={{ ...S.btnGhost, padding: '6px 14px', fontSize: 13 }} className="no-print">Editar import</a>
+                    : <a href={`/payments/${p.id}`} style={{ ...S.btnGhost, padding: '6px 14px', fontSize: 13 }} className="no-print">Editar</a>
+                  }
                 </div>
               </div>
             )

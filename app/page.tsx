@@ -320,6 +320,7 @@ function printCard(el: HTMLElement) {
 function ImportCard({ item, today, bnaRate }: any) {
   const cardRef = useRef<HTMLDivElement>(null)
   const itemPayments = item.payments || []
+  const arcaPayment = itemPayments.find((p: any) => p.concept === 'ARCA')
   const paidTotal = itemPayments.filter((p: any) => p.status?.toLowerCase() === 'pagado').reduce((t: number, p: any) => t + Number(p.amount || 0), 0)
   const pendingPayments = itemPayments.filter((p: any) => p.status?.toLowerCase() !== 'pagado')
   const overdueItemPayments = pendingPayments.filter((p: any) => p.due_date && p.due_date < today)
@@ -372,7 +373,7 @@ function ImportCard({ item, today, bnaRate }: any) {
   }[semaphore]
 
   const pendingForCard = itemPayments
-    .filter((p: any) => p.status !== 'Pagado')
+    .filter((p: any) => p.status?.toLowerCase() !== 'pagado')
     .sort((a: any, b: any) => a.due_date?.localeCompare(b.due_date ?? '') ?? 0)
     .slice(0, 2)
 
@@ -482,10 +483,10 @@ function ImportCard({ item, today, bnaRate }: any) {
               )}
             </>
           ) : (
-            <DataRow label="Estimado" value={money(item.arca_estimated, 'ARS')} small />
+            <DataRow label="Estimado" value={money(arcaPayment ? arcaPayment.amount : item.arca_estimated, 'ARS')} small />
           )}
-          <DataRow label="Pago" value={formatDate(item.arca_payment_date)} small />
-          <DataRow label="Estado" value={item.arca_status || 'Pendiente'} small />
+          <DataRow label="Pago" value={formatDate(arcaPayment ? arcaPayment.due_date : item.arca_payment_date)} small />
+          <DataRow label="Estado" value={arcaPayment ? arcaPayment.status : (item.arca_status || 'Pendiente')} small />
         </div>
       </div>
 
