@@ -84,8 +84,9 @@ export default function PaymentsPage() {
       id: `arca-${i.id}`,
       import_id: i.id,
       concept: 'ARCA',
-      amount: i.arca_estimated || 0,
-      currency: 'ARS',
+      amount: i.arca_usd || 0,
+      currency: 'USD',
+      _arca_estimated: i.arca_estimated || 0,
       due_date: i.arca_payment_date || null,
       status: i.arca_status || 'Pendiente',
       imports: { code: i.code },
@@ -238,6 +239,9 @@ export default function PaymentsPage() {
                   </div>
                   <div style={{ display: 'flex', gap: 20, fontSize: 15, color: '#94a3b8' }}>
                     <span style={{ color: '#0f172a', fontWeight: 700, fontFamily: 'monospace' }}>{p.currency === 'USD' ? `U$S ${Number(p.amount||0).toLocaleString('es-AR')}` : `$ ${Number(p.amount||0).toLocaleString('es-AR')}`}</span>
+                    {p._arca_estimated > 0 && (
+                      <span style={{ color: '#f97316', fontWeight: 700, fontFamily: 'monospace' }}>{`$ ${Number(p._arca_estimated).toLocaleString('es-AR')}`}</span>
+                    )}
                     <span style={{ fontFamily: 'monospace' }}>Vence: {formatDate(p.due_date)}</span>
                   </div>
                 </div>
