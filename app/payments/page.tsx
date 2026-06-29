@@ -48,11 +48,16 @@ export default function PaymentsPage() {
   const [dueDate, setDueDate] = useState('')
   const [status, setStatus] = useState('Pendiente')
   const [historyFilter, setHistoryFilter] = useState<'Todos' | 'Pendiente' | 'Pagado'>('Todos')
+  const [bnaRate, setBnaRate] = useState<number>(0)
 
   useEffect(() => {
     const importIdFromUrl = new URLSearchParams(window.location.search).get('importId')
     if (importIdFromUrl) setImportId(importIdFromUrl)
     loadData()
+    fetch('https://dolarapi.com/v1/dolares/oficial')
+      .then(r => r.json())
+      .then(d => setBnaRate(d.venta || 0))
+      .catch(() => {})
   }, [])
 
   async function loadData() {
@@ -86,7 +91,7 @@ export default function PaymentsPage() {
       concept: 'ARCA',
       amount: i.arca_usd || 0,
       currency: 'USD',
-      _arca_estimated: i.arca_estimated || 0,
+      _arca_estimated: bnaRate > 0 ? Math.round(Number(i.arca_usd || 0) * bnaRate) : (i.arca_estimated || 0),
       due_date: i.arca_payment_date || null,
       status: i.arca_status || 'Pendiente',
       imports: { code: i.code },
