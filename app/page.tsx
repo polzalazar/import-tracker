@@ -372,7 +372,12 @@ function ImportCard({ item, today, bnaRate }: any) {
     ok:    { color: '#16a34a', label: 'Todo al día', char: '✓' },
   }[semaphore]
 
-  const pendingForCard = itemPayments
+  // Si no hay pago ARCA real y el import tiene datos ARCA pendientes, agregar entrada sintética
+  const arcaSynth = !arcaPayment && (item.arca_usd || item.arca_estimated) && item.arca_payment_date && item.arca_status?.toLowerCase() !== 'pagado'
+    ? [{ id: `arca-${item.id}`, concept: 'ARCA', currency: 'USD', amount: item.arca_usd || 0, due_date: item.arca_payment_date, status: item.arca_status || 'Pendiente' }]
+    : []
+
+  const pendingForCard = [...itemPayments, ...arcaSynth]
     .filter((p: any) => p.status?.toLowerCase() !== 'pagado')
     .sort((a: any, b: any) => a.due_date?.localeCompare(b.due_date ?? '') ?? 0)
     .slice(0, 2)
